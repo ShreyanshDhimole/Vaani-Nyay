@@ -111,28 +111,34 @@ const BankAccountForm = () => {
   };
 
   if (showPreview) {
-    return <FormPreview formData={formData} onBack={() => setShowPreview(false)} />;
+    return <FormPreview formData={formData} onBack={() => setShowPreview(false)} onEdit={(field) => {
+      const fieldIndex = formFields.findIndex(f => f.key === field);
+      if (fieldIndex !== -1) {
+        setCurrentStep(fieldIndex);
+        setShowPreview(false);
+      }
+    }} />;
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
+    <div className="min-h-screen bg-[#141E28] p-6">
       <div className="max-w-2xl mx-auto">
         <div className="mb-6">
           <Button
             variant="outline"
             onClick={() => navigate('/')}
-            className="mb-4"
+            className="mb-4 border-[#33FEBF] text-[#33FEBF] hover:bg-[#33FEBF] hover:text-[#141E28]"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Forms
           </Button>
           
-          <div className="bg-white rounded-lg p-4 shadow-sm">
+          <div className="bg-white rounded-lg p-4 shadow-sm border border-[#33FEBF]">
             <div className="flex justify-between items-center mb-2">
               <span className="text-sm text-gray-600">
                 Step {currentStep + 1} of {formFields.length}
               </span>
-              <span className="text-sm font-medium text-blue-600">
+              <span className="text-sm font-medium text-[#33FEBF]">
                 {Math.round(progress)}% Complete
               </span>
             </div>
@@ -140,19 +146,19 @@ const BankAccountForm = () => {
           </div>
         </div>
 
-        <Card className="shadow-lg">
-          <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
+        <Card className="shadow-lg border border-[#33FEBF]">
+          <CardHeader className="bg-[#33FEBF] text-[#141E28] rounded-t-lg">
             <CardTitle className="text-center">
               SBI Account Opening Form - Part I
             </CardTitle>
-            <p className="text-center text-blue-100 text-sm">
+            <p className="text-center text-[#141E28]/80 text-sm">
               Customer Information Sheet (CIF Creation/Amendment)
             </p>
           </CardHeader>
           
-          <CardContent className="p-8">
+          <CardContent className="p-8 bg-white">
             <div className="mb-6">
-              <Label className="text-lg font-medium text-gray-800">
+              <Label className="text-lg font-medium text-[#141E28]">
                 {currentField.label}
                 {currentField.required && <span className="text-red-500 ml-1">*</span>}
               </Label>
@@ -166,14 +172,14 @@ const BankAccountForm = () => {
                 <Button
                   variant={!useVoice ? "default" : "outline"}
                   onClick={() => setUseVoice(false)}
-                  className="flex-1"
+                  className={`flex-1 ${!useVoice ? 'bg-[#33FEBF] text-[#141E28] hover:bg-[#33FEBF]/90' : 'border-[#33FEBF] text-[#33FEBF] hover:bg-[#33FEBF] hover:text-[#141E28]'}`}
                 >
                   Text Input
                 </Button>
                 <Button
                   variant={useVoice ? "default" : "outline"}
                   onClick={() => setUseVoice(true)}
-                  className="flex-1"
+                  className={`flex-1 ${useVoice ? 'bg-[#33FEBF] text-[#141E28] hover:bg-[#33FEBF]/90' : 'border-[#33FEBF] text-[#33FEBF] hover:bg-[#33FEBF] hover:text-[#141E28]'}`}
                 >
                   <Mic className="w-4 h-4 mr-2" />
                   Voice Input
@@ -193,7 +199,7 @@ const BankAccountForm = () => {
                     <select
                       value={formData[currentField.key as keyof FormData]}
                       onChange={(e) => handleInputChange(e.target.value)}
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full p-3 border border-[#33FEBF] rounded-lg focus:ring-2 focus:ring-[#33FEBF] focus:border-transparent"
                     >
                       <option value="">Select {currentField.label}</option>
                       {currentField.options?.map((option) => (
@@ -208,7 +214,7 @@ const BankAccountForm = () => {
                       value={formData[currentField.key as keyof FormData]}
                       onChange={(e) => handleInputChange(e.target.value)}
                       placeholder={`Enter your ${currentField.label.toLowerCase()}`}
-                      className="w-full p-3 text-lg"
+                      className="w-full p-3 text-lg border-[#33FEBF] focus:ring-[#33FEBF]"
                     />
                   )}
                 </div>
@@ -220,6 +226,7 @@ const BankAccountForm = () => {
                 variant="outline"
                 onClick={handlePrevious}
                 disabled={currentStep === 0}
+                className="border-[#33FEBF] text-[#33FEBF] hover:bg-[#33FEBF] hover:text-[#141E28] disabled:opacity-50"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Previous
@@ -228,7 +235,7 @@ const BankAccountForm = () => {
               <Button
                 onClick={() => setShowPreview(true)}
                 variant="outline"
-                className="text-blue-600 border-blue-600 hover:bg-blue-50"
+                className="text-[#33FEBF] border-[#33FEBF] hover:bg-[#33FEBF] hover:text-[#141E28]"
               >
                 <Eye className="w-4 h-4 mr-2" />
                 Preview
@@ -238,7 +245,7 @@ const BankAccountForm = () => {
                 <Button
                   onClick={handleSubmit}
                   disabled={!canProceed()}
-                  className="bg-green-600 hover:bg-green-700"
+                  className="bg-[#33FEBF] hover:bg-[#33FEBF]/90 text-[#141E28] disabled:opacity-50"
                 >
                   Complete Form
                 </Button>
@@ -246,6 +253,7 @@ const BankAccountForm = () => {
                 <Button
                   onClick={handleNext}
                   disabled={!canProceed()}
+                  className="bg-[#33FEBF] hover:bg-[#33FEBF]/90 text-[#141E28] disabled:opacity-50"
                 >
                   Next
                   <ArrowRight className="w-4 h-4 ml-2" />

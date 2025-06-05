@@ -26,7 +26,7 @@ const VoiceInput = ({ value, onChange, placeholder, field }: VoiceInputProps) =>
 
   useEffect(() => {
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
       const recognitionInstance = new SpeechRecognition();
       
       recognitionInstance.continuous = false;
@@ -41,7 +41,7 @@ const VoiceInput = ({ value, onChange, placeholder, field }: VoiceInputProps) =>
         });
       };
 
-      recognitionInstance.onresult = (event) => {
+      recognitionInstance.onresult = (event: any) => {
         const current = event.resultIndex;
         const transcript = event.results[current][0].transcript;
         setTranscript(transcript);
@@ -53,7 +53,7 @@ const VoiceInput = ({ value, onChange, placeholder, field }: VoiceInputProps) =>
         }
       };
 
-      recognitionInstance.onerror = (event) => {
+      recognitionInstance.onerror = (event: any) => {
         console.error('Speech recognition error:', event.error);
         setIsListening(false);
         toast({
@@ -151,6 +151,11 @@ const VoiceInput = ({ value, onChange, placeholder, field }: VoiceInputProps) =>
     speechSynthesis.speak(utterance);
   };
 
+  const playQuestion = () => {
+    const utterance = new SpeechSynthesisUtterance(field.label);
+    speechSynthesis.speak(utterance);
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center space-x-2">
@@ -158,7 +163,7 @@ const VoiceInput = ({ value, onChange, placeholder, field }: VoiceInputProps) =>
           value={value || transcript}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
-          className="flex-1"
+          className="flex-1 border-[#33FEBF] focus:ring-[#33FEBF]"
         />
         <Button
           type="button"
@@ -166,6 +171,17 @@ const VoiceInput = ({ value, onChange, placeholder, field }: VoiceInputProps) =>
           size="icon"
           onClick={playText}
           disabled={!value && !transcript}
+          className="border-[#33FEBF] text-[#33FEBF] hover:bg-[#33FEBF] hover:text-white"
+        >
+          <Volume2 className="w-4 h-4" />
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          onClick={playQuestion}
+          className="border-[#33FEBF] text-[#33FEBF] hover:bg-[#33FEBF] hover:text-white"
+          title="Listen to question"
         >
           <Volume2 className="w-4 h-4" />
         </Button>
@@ -178,7 +194,7 @@ const VoiceInput = ({ value, onChange, placeholder, field }: VoiceInputProps) =>
           className={`w-16 h-16 rounded-full ${
             isListening 
               ? 'bg-red-500 hover:bg-red-600 animate-pulse' 
-              : 'bg-blue-500 hover:bg-blue-600'
+              : 'bg-[#33FEBF] hover:bg-[#33FEBF]/90'
           }`}
         >
           {isListening ? <MicOff className="w-6 h-6" /> : <Mic className="w-6 h-6" />}
@@ -187,31 +203,31 @@ const VoiceInput = ({ value, onChange, placeholder, field }: VoiceInputProps) =>
       
       {isListening && (
         <div className="text-center">
-          <div className="inline-flex items-center space-x-2 bg-blue-100 px-4 py-2 rounded-full">
-            <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
-            <span className="text-blue-700 text-sm">Listening...</span>
+          <div className="inline-flex items-center space-x-2 bg-[#33FEBF]/20 px-4 py-2 rounded-full">
+            <div className="w-2 h-2 bg-[#33FEBF] rounded-full animate-bounce"></div>
+            <span className="text-[#33FEBF] text-sm">Listening...</span>
           </div>
         </div>
       )}
       
       {transcript && (
-        <div className="bg-gray-50 p-3 rounded-lg">
+        <div className="bg-gray-50 p-3 rounded-lg border border-[#33FEBF]">
           <p className="text-sm text-gray-600 mb-1">Recognized:</p>
           <p className="text-gray-800">{transcript}</p>
         </div>
       )}
       
       {showSuggestion && (
-        <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
-          <p className="text-sm text-yellow-800 mb-2">Auto-correction suggestion:</p>
+        <div className="bg-[#33FEBF]/10 border border-[#33FEBF] p-4 rounded-lg">
+          <p className="text-sm text-[#141E28] mb-2">Auto-correction suggestion:</p>
           <div className="flex items-center justify-between">
-            <p className="text-yellow-900 font-medium">{suggestion}</p>
+            <p className="text-[#141E28] font-medium">{suggestion}</p>
             <div className="flex space-x-2">
-              <Button size="sm" onClick={acceptSuggestion} className="bg-green-600 hover:bg-green-700">
+              <Button size="sm" onClick={acceptSuggestion} className="bg-[#33FEBF] hover:bg-[#33FEBF]/90 text-[#141E28]">
                 <Check className="w-4 h-4 mr-1" />
                 Accept
               </Button>
-              <Button size="sm" variant="outline" onClick={rejectSuggestion}>
+              <Button size="sm" variant="outline" onClick={rejectSuggestion} className="border-[#33FEBF] text-[#33FEBF]">
                 <X className="w-4 h-4 mr-1" />
                 Reject
               </Button>

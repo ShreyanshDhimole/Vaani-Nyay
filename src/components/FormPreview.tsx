@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Download, Send } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import CharacterBoxes from './CharacterBoxes';
 
 interface FormData {
   branchName: string;
@@ -29,9 +30,10 @@ interface FormData {
 interface FormPreviewProps {
   formData: FormData;
   onBack: () => void;
+  onEdit: (field: string) => void;
 }
 
-const FormPreview = ({ formData, onBack }: FormPreviewProps) => {
+const FormPreview = ({ formData, onBack, onEdit }: FormPreviewProps) => {
   const handleSubmit = () => {
     toast({
       title: "Form Submitted Successfully!",
@@ -47,17 +49,21 @@ const FormPreview = ({ formData, onBack }: FormPreviewProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
+    <div className="min-h-screen bg-[#141E28] p-6">
       <div className="max-w-4xl mx-auto">
         <div className="mb-6">
-          <Button variant="outline" onClick={onBack} className="mb-4">
+          <Button 
+            variant="outline" 
+            onClick={onBack} 
+            className="mb-4 border-[#33FEBF] text-[#33FEBF] hover:bg-[#33FEBF] hover:text-[#141E28]"
+          >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Form
           </Button>
         </div>
 
-        <Card className="shadow-lg">
-          <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-700 text-white">
+        <Card className="shadow-lg border border-[#33FEBF] bg-white">
+          <CardHeader className="bg-[#33FEBF] text-[#141E28]">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <img 
@@ -69,10 +75,10 @@ const FormPreview = ({ formData, onBack }: FormPreviewProps) => {
                   <CardTitle className="text-xl">
                     ACCOUNT OPENING FORM FOR RESIDENT INDIVIDUAL (PART - I)
                   </CardTitle>
-                  <p className="text-blue-100 text-sm">
+                  <p className="text-[#141E28]/80 text-sm">
                     (Must accompanied with Terms and Conditions)
                   </p>
-                  <p className="text-blue-100 text-sm">
+                  <p className="text-[#141E28]/80 text-sm">
                     CUSTOMER INFORMATION SHEET (CIF Creation/Amendment)
                   </p>
                 </div>
@@ -81,43 +87,78 @@ const FormPreview = ({ formData, onBack }: FormPreviewProps) => {
                 <p className="text-sm">Date:</p>
                 <div className="grid grid-cols-3 gap-1 mt-1">
                   {Array.from({ length: 9 }, (_, i) => (
-                    <div key={i} className="w-6 h-6 border border-white bg-white/20"></div>
+                    <div key={i} className="w-6 h-6 border border-[#141E28] bg-white/20"></div>
                   ))}
                 </div>
               </div>
             </div>
           </CardHeader>
 
-          <CardContent className="p-8 space-y-6">
+          <CardContent className="p-8 space-y-6 bg-white">
             {/* Header Information */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-b pb-6">
               <div>
-                <h3 className="font-semibold text-gray-800 mb-3">Branch Information</h3>
-                <div className="space-y-2">
-                  <div className="flex">
-                    <span className="w-32 text-sm font-medium">Branch Name:</span>
-                    <span className="text-sm">{formData.branchName || 'Not provided'}</span>
+                <h3 className="font-semibold text-[#141E28] mb-3">Branch Information</h3>
+                <div className="space-y-4">
+                  <div>
+                    <span className="block text-sm font-medium mb-2">Branch Name:</span>
+                    <CharacterBoxes 
+                      text={formData.branchName || ''} 
+                      maxLength={25}
+                      onEdit={() => onEdit('branchName')}
+                    />
                   </div>
-                  <div className="flex">
-                    <span className="w-32 text-sm font-medium">Branch Code:</span>
-                    <span className="text-sm">{formData.branchCode || 'Not provided'}</span>
+                  <div>
+                    <span className="block text-sm font-medium mb-2">Branch Code:</span>
+                    <CharacterBoxes 
+                      text={formData.branchCode || ''} 
+                      maxLength={10}
+                      onEdit={() => onEdit('branchCode')}
+                    />
                   </div>
                 </div>
               </div>
               <div>
-                <h3 className="font-semibold text-gray-800 mb-3">Application Details</h3>
-                <div className="space-y-2">
-                  <div className="flex">
-                    <span className="w-32 text-sm font-medium">Customer ID:</span>
-                    <span className="text-sm">{formData.customerId || 'Not provided'}</span>
+                <h3 className="font-semibold text-[#141E28] mb-3">Application Details</h3>
+                <div className="space-y-4">
+                  <div>
+                    <span className="block text-sm font-medium mb-2">Customer ID:</span>
+                    <CharacterBoxes 
+                      text={formData.customerId || ''} 
+                      maxLength={15}
+                      onEdit={() => onEdit('customerId')}
+                    />
                   </div>
-                  <div className="flex">
-                    <span className="w-32 text-sm font-medium">CKYC No:</span>
-                    <span className="text-sm">{formData.ckyc || 'Not provided'}</span>
+                  <div>
+                    <span className="block text-sm font-medium mb-2">CKYC No:</span>
+                    <CharacterBoxes 
+                      text={formData.ckyc || ''} 
+                      maxLength={14}
+                      onEdit={() => onEdit('ckyc')}
+                    />
                   </div>
-                  <div className="flex">
-                    <span className="w-32 text-sm font-medium">Application Type:</span>
-                    <span className="text-sm">{formData.applicationType}</span>
+                  <div>
+                    <span className="block text-sm font-medium mb-2">Application Type:</span>
+                    <div className="flex items-center space-x-4">
+                      <label className="flex items-center space-x-2">
+                        <input 
+                          type="radio" 
+                          checked={formData.applicationType === 'New'} 
+                          readOnly 
+                          className="text-[#33FEBF]"
+                        />
+                        <span className="text-sm">New</span>
+                      </label>
+                      <label className="flex items-center space-x-2">
+                        <input 
+                          type="radio" 
+                          checked={formData.applicationType === 'Amendment'} 
+                          readOnly 
+                          className="text-[#33FEBF]"
+                        />
+                        <span className="text-sm">Amendment</span>
+                      </label>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -125,79 +166,155 @@ const FormPreview = ({ formData, onBack }: FormPreviewProps) => {
 
             {/* Personal Details */}
             <div>
-              <h3 className="font-semibold text-gray-800 mb-4 text-lg bg-blue-50 p-3 rounded">
+              <h3 className="font-semibold text-[#141E28] mb-4 text-lg bg-[#33FEBF]/20 p-3 rounded">
                 A Personal Details
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-3">
+                <div className="space-y-4">
                   <div>
-                    <span className="block text-sm font-medium text-gray-600">1. Name:</span>
-                    <p className="text-gray-800 border-b border-dotted border-gray-300 pb-1">
-                      {formData.name || 'Not provided'}
-                    </p>
+                    <span className="block text-sm font-medium text-[#141E28] mb-2">1. Name:</span>
+                    <CharacterBoxes 
+                      text={formData.name || ''} 
+                      maxLength={30}
+                      onEdit={() => onEdit('name')}
+                    />
                   </div>
                   <div>
-                    <span className="block text-sm font-medium text-gray-600">2. Maiden Name:</span>
-                    <p className="text-gray-800 border-b border-dotted border-gray-300 pb-1">
-                      {formData.maidenName || 'Not provided'}
-                    </p>
+                    <span className="block text-sm font-medium text-[#141E28] mb-2">2. Maiden Name:</span>
+                    <CharacterBoxes 
+                      text={formData.maidenName || ''} 
+                      maxLength={25}
+                      onEdit={() => onEdit('maidenName')}
+                    />
                   </div>
                   <div>
-                    <span className="block text-sm font-medium text-gray-600">3. Date of Birth:</span>
-                    <p className="text-gray-800 border-b border-dotted border-gray-300 pb-1">
-                      {formData.dateOfBirth || 'Not provided'}
-                    </p>
+                    <span className="block text-sm font-medium text-[#141E28] mb-2">3. Date of Birth:</span>
+                    <CharacterBoxes 
+                      text={formData.dateOfBirth || ''} 
+                      maxLength={10}
+                      onEdit={() => onEdit('dateOfBirth')}
+                    />
                   </div>
                   <div>
-                    <span className="block text-sm font-medium text-gray-600">4. Gender:</span>
-                    <p className="text-gray-800 border-b border-dotted border-gray-300 pb-1">
-                      {formData.gender || 'Not provided'}
-                    </p>
+                    <span className="block text-sm font-medium text-[#141E28] mb-2">4. Gender:</span>
+                    <div className="flex items-center space-x-4">
+                      <label className="flex items-center space-x-2">
+                        <input 
+                          type="radio" 
+                          checked={formData.gender === 'Male'} 
+                          readOnly 
+                          className="text-[#33FEBF]"
+                        />
+                        <span className="text-sm">Male</span>
+                      </label>
+                      <label className="flex items-center space-x-2">
+                        <input 
+                          type="radio" 
+                          checked={formData.gender === 'Female'} 
+                          readOnly 
+                          className="text-[#33FEBF]"
+                        />
+                        <span className="text-sm">Female</span>
+                      </label>
+                      <label className="flex items-center space-x-2">
+                        <input 
+                          type="radio" 
+                          checked={formData.gender === 'Third Gender'} 
+                          readOnly 
+                          className="text-[#33FEBF]"
+                        />
+                        <span className="text-sm">Third Gender</span>
+                      </label>
+                    </div>
                   </div>
                   <div>
-                    <span className="block text-sm font-medium text-gray-600">5. Marital Status:</span>
-                    <p className="text-gray-800 border-b border-dotted border-gray-300 pb-1">
-                      {formData.maritalStatus || 'Not provided'}
-                    </p>
+                    <span className="block text-sm font-medium text-[#141E28] mb-2">5. Marital Status:</span>
+                    <div className="flex items-center space-x-4">
+                      <label className="flex items-center space-x-2">
+                        <input 
+                          type="radio" 
+                          checked={formData.maritalStatus === 'Married'} 
+                          readOnly 
+                          className="text-[#33FEBF]"
+                        />
+                        <span className="text-sm">Married</span>
+                      </label>
+                      <label className="flex items-center space-x-2">
+                        <input 
+                          type="radio" 
+                          checked={formData.maritalStatus === 'Unmarried'} 
+                          readOnly 
+                          className="text-[#33FEBF]"
+                        />
+                        <span className="text-sm">Unmarried</span>
+                      </label>
+                    </div>
                   </div>
                 </div>
                 
-                <div className="space-y-3">
+                <div className="space-y-4">
                   <div>
-                    <span className="block text-sm font-medium text-gray-600">6. No of Dependents:</span>
-                    <p className="text-gray-800 border-b border-dotted border-gray-300 pb-1">
-                      {formData.dependents || 'Not provided'}
-                    </p>
+                    <span className="block text-sm font-medium text-[#141E28] mb-2">6. No of Dependents:</span>
+                    <CharacterBoxes 
+                      text={formData.dependents || ''} 
+                      maxLength={2}
+                      onEdit={() => onEdit('dependents')}
+                    />
                   </div>
                   <div>
-                    <span className="block text-sm font-medium text-gray-600">7. Father's Name:</span>
-                    <p className="text-gray-800 border-b border-dotted border-gray-300 pb-1">
-                      {formData.fatherName || 'Not provided'}
-                    </p>
+                    <span className="block text-sm font-medium text-[#141E28] mb-2">7. Father's Name:</span>
+                    <CharacterBoxes 
+                      text={formData.fatherName || ''} 
+                      maxLength={30}
+                      onEdit={() => onEdit('fatherName')}
+                    />
                   </div>
                   <div>
-                    <span className="block text-sm font-medium text-gray-600">8. Mother's Name:</span>
-                    <p className="text-gray-800 border-b border-dotted border-gray-300 pb-1">
-                      {formData.motherName || 'Not provided'}
-                    </p>
+                    <span className="block text-sm font-medium text-[#141E28] mb-2">8. Mother's Name:</span>
+                    <CharacterBoxes 
+                      text={formData.motherName || ''} 
+                      maxLength={30}
+                      onEdit={() => onEdit('motherName')}
+                    />
                   </div>
                   <div>
-                    <span className="block text-sm font-medium text-gray-600">9. Spouse Name:</span>
-                    <p className="text-gray-800 border-b border-dotted border-gray-300 pb-1">
-                      {formData.spouseName || 'Not provided'}
-                    </p>
+                    <span className="block text-sm font-medium text-[#141E28] mb-2">9. Spouse Name:</span>
+                    <CharacterBoxes 
+                      text={formData.spouseName || ''} 
+                      maxLength={30}
+                      onEdit={() => onEdit('spouseName')}
+                    />
                   </div>
                   <div>
-                    <span className="block text-sm font-medium text-gray-600">10. Nationality:</span>
-                    <p className="text-gray-800 border-b border-dotted border-gray-300 pb-1">
-                      {formData.nationality || 'Not provided'}
-                    </p>
+                    <span className="block text-sm font-medium text-[#141E28] mb-2">10. Nationality:</span>
+                    <div className="flex items-center space-x-4">
+                      <label className="flex items-center space-x-2">
+                        <input 
+                          type="radio" 
+                          checked={formData.nationality === 'In-Indian'} 
+                          readOnly 
+                          className="text-[#33FEBF]"
+                        />
+                        <span className="text-sm">In-Indian</span>
+                      </label>
+                      <label className="flex items-center space-x-2">
+                        <input 
+                          type="radio" 
+                          checked={formData.nationality === 'Others'} 
+                          readOnly 
+                          className="text-[#33FEBF]"
+                        />
+                        <span className="text-sm">Others</span>
+                      </label>
+                    </div>
                   </div>
                   <div>
-                    <span className="block text-sm font-medium text-gray-600">11. Citizenship:</span>
-                    <p className="text-gray-800 border-b border-dotted border-gray-300 pb-1">
-                      {formData.citizenship || 'Not provided'}
-                    </p>
+                    <span className="block text-sm font-medium text-[#141E28] mb-2">11. Citizenship:</span>
+                    <CharacterBoxes 
+                      text={formData.citizenship || ''} 
+                      maxLength={20}
+                      onEdit={() => onEdit('citizenship')}
+                    />
                   </div>
                 </div>
               </div>
@@ -205,11 +322,18 @@ const FormPreview = ({ formData, onBack }: FormPreviewProps) => {
 
             {/* Action Buttons */}
             <div className="flex justify-center space-x-4 pt-6 border-t">
-              <Button variant="outline" onClick={handleDownload}>
+              <Button 
+                variant="outline" 
+                onClick={handleDownload}
+                className="border-[#33FEBF] text-[#33FEBF] hover:bg-[#33FEBF] hover:text-[#141E28]"
+              >
                 <Download className="w-4 h-4 mr-2" />
                 Download PDF
               </Button>
-              <Button onClick={handleSubmit} className="bg-green-600 hover:bg-green-700">
+              <Button 
+                onClick={handleSubmit} 
+                className="bg-[#33FEBF] hover:bg-[#33FEBF]/90 text-[#141E28]"
+              >
                 <Send className="w-4 h-4 mr-2" />
                 Submit Form
               </Button>

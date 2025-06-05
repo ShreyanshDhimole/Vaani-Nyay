@@ -16,21 +16,21 @@ const FormPage = () => {
 
   // Placeholder for other forms
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
+    <div className="min-h-screen bg-[#141E28] p-6">
       <div className="max-w-2xl mx-auto">
         <Button
           variant="outline"
           onClick={() => navigate('/')}
-          className="mb-6"
+          className="mb-6 border-[#33FEBF] text-[#33FEBF] hover:bg-[#33FEBF] hover:text-[#141E28]"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Forms
         </Button>
         
-        <Card className="text-center py-12">
+        <Card className="text-center py-12 border border-[#33FEBF] bg-white">
           <CardHeader>
-            <Construction className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-            <CardTitle className="text-2xl text-gray-800">Form Coming Soon</CardTitle>
+            <Construction className="w-16 h-16 mx-auto mb-4 text-[#33FEBF]" />
+            <CardTitle className="text-2xl text-[#141E28]">Form Coming Soon</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-gray-600 mb-6">
