@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Mic, MicOff, Volume2, Check, X, ArrowLeft, ArrowRight } from 'lucide-react';
+import { Mic, MicOff, Volume2, Check, X, ArrowLeft, ArrowRight, Home, HelpCircle } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useNavigate } from 'react-router-dom';
 
 interface VoiceInputProps {
   value: string;
@@ -22,6 +23,33 @@ interface VoiceInputProps {
   isLastField?: boolean;
 }
 
+const getFieldExample = (fieldKey: string) => {
+  const examples: { [key: string]: string } = {
+    assemblyConstituencyNo: 'e.g., 123',
+    assemblyConstituencyName: 'e.g., Rajouri Garden',
+    parliamentaryConstituencyNo: 'e.g., 7',
+    parliamentaryConstituencyName: 'e.g., New Delhi',
+    applicantName: 'e.g., John Doe',
+    epicNo: 'e.g., ABC1234567',
+    aadhaarNumber: 'e.g., 1234 5678 9012',
+    mobileNoSelf: 'e.g., 9876543210',
+    mobileNoRelative: 'e.g., 9876543211',
+    emailSelf: 'e.g., john@example.com',
+    emailRelative: 'e.g., parent@example.com',
+    shiftingReason: 'e.g., Job transfer',
+    'presentAddress.houseNo': 'e.g., A-123',
+    'presentAddress.streetArea': 'e.g., Main Street',
+    'presentAddress.townVillage': 'e.g., Delhi',
+    'presentAddress.postOffice': 'e.g., Central Post Office',
+    'presentAddress.pinCode': 'e.g., 110001',
+    'presentAddress.tehsilTaluka': 'e.g., Central Delhi',
+    'presentAddress.district': 'e.g., New Delhi',
+    'presentAddress.stateUt': 'e.g., Delhi',
+    otherDocument: 'e.g., Property tax receipt'
+  };
+  return examples[fieldKey] || 'Enter your information here';
+};
+
 const VoiceInput = ({ 
   value, 
   onChange, 
@@ -34,11 +62,13 @@ const VoiceInput = ({
   isLastField = false 
 }: VoiceInputProps) => {
   const { translate } = useLanguage();
+  const navigate = useNavigate();
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
   const [recognition, setRecognition] = useState<SpeechRecognition | null>(null);
   const [showSuggestion, setShowSuggestion] = useState(false);
   const [suggestion, setSuggestion] = useState('');
+  const [showExample, setShowExample] = useState(false);
 
   useEffect(() => {
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
@@ -174,6 +204,12 @@ const VoiceInput = ({
     speechSynthesis.speak(utterance);
   };
 
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && onNext && canGoNext) {
+      onNext();
+    }
+  };
+
   return (
     <>
       {/* Full screen overlay when listening */}
@@ -232,8 +268,17 @@ const VoiceInput = ({
                 {translate('button.previous')}
               </Button>
               
+              <Button
+                variant="ghost"
+                onClick={() => navigate('/')}
+                className="text-[#141E28] hover:bg-[#141E28] hover:text-[#33FEBF]"
+              >
+                <Home className="w-4 h-4 mr-2" />
+                Home
+              </Button>
+              
               <h2 className="text-xl font-bold text-center flex-1">
-                {field.label}
+                {field.label}?
               </h2>
               
               <Button
@@ -253,12 +298,24 @@ const VoiceInput = ({
             <div className="w-full max-w-4xl mx-auto">
               <div className="space-y-8">
                 <div className="flex items-center space-x-4">
-                  <Input
-                    value={value || transcript}
-                    onChange={(e) => onChange(e.target.value)}
-                    placeholder={placeholder}
-                    className="flex-1 border-2 border-[#33FEBF] focus:ring-[#33FEBF] text-xl p-6 rounded-xl"
-                  />
+                  <div className="flex-1 relative">
+                    <Input
+                      value={value || transcript}
+                      onChange={(e) => onChange(e.target.value)}
+                      onKeyPress={handleKeyPress}
+                      placeholder={placeholder}
+                      className="border-2 border-[#33FEBF] focus:ring-[#33FEBF] text-xl p-6 rounded-xl pr-12"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setShowExample(!showExample)}
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 text-[#33FEBF] hover:bg-[#33FEBF] hover:text-white"
+                    >
+                      <HelpCircle className="w-5 h-5" />
+                    </Button>
+                  </div>
                   <Button
                     type="button"
                     variant="outline"
@@ -280,6 +337,13 @@ const VoiceInput = ({
                     <Volume2 className="w-6 h-6" />
                   </Button>
                 </div>
+
+                {showExample && (
+                  <div className="bg-blue-50 border border-blue-200 p-4 rounded-xl">
+                    <p className="text-blue-800 font-medium">Example:</p>
+                    <p className="text-blue-600">{getFieldExample(field.key)}</p>
+                  </div>
+                )}
                 
                 <div className="flex justify-center">
                   <Button

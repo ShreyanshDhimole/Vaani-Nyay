@@ -158,7 +158,10 @@ const VoterIdForm = () => {
   };
 
   const prevStep = () => {
-    if (currentStep > 0) {
+    if (showPreview) {
+      setShowPreview(false);
+      setCurrentStep(formFields.length - 1);
+    } else if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
     }
   };
@@ -169,7 +172,7 @@ const VoterIdForm = () => {
     return (
       <VoterIdPreview
         formData={formData}
-        onBack={() => setShowPreview(false)}
+        onBack={prevStep}
         onEdit={(field: string) => {
           const fieldIndex = formFields.findIndex(f => f.key === field);
           if (fieldIndex !== -1) {
@@ -192,7 +195,7 @@ const VoterIdForm = () => {
         onNext={nextStep}
         onPrevious={prevStep}
         canGoNext={true}
-        canGoPrevious={currentStep > 0}
+        canGoPrevious={currentStep > 0 || showPreview}
         isLastField={currentStep === formFields.length - 1}
       />
     );
