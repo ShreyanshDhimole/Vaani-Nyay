@@ -1,9 +1,9 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Mic, MicOff, Volume2, Check, X } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface VoiceInputProps {
   value: string;
@@ -18,6 +18,7 @@ interface VoiceInputProps {
 }
 
 const VoiceInput = ({ value, onChange, placeholder, field }: VoiceInputProps) => {
+  const { translate } = useLanguage();
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
   const [recognition, setRecognition] = useState<SpeechRecognition | null>(null);
@@ -163,103 +164,115 @@ const VoiceInput = ({ value, onChange, placeholder, field }: VoiceInputProps) =>
       {/* Full screen overlay when listening */}
       {isListening && (
         <div className="fixed inset-0 bg-white z-50 flex items-center justify-center">
-          <div className="text-center max-w-2xl mx-auto p-8">
-            <div className="mb-8">
-              <h2 className="text-3xl font-bold text-[#141E28] mb-4">
+          <div className="text-center max-w-4xl mx-auto p-12">
+            <div className="mb-12">
+              <h2 className="text-4xl font-bold text-[#141E28] mb-6">
                 {field.label}
               </h2>
-              <p className="text-lg text-gray-600 mb-8">
+              <p className="text-xl text-gray-600 mb-12">
                 Speak clearly into your microphone
               </p>
             </div>
             
-            <div className="mb-8">
+            <div className="mb-12">
               <Button
                 type="button"
                 onClick={stopListening}
-                className="w-24 h-24 rounded-full bg-red-500 hover:bg-red-600 animate-pulse"
+                className="w-32 h-32 rounded-full bg-red-500 hover:bg-red-600 animate-pulse text-white"
               >
-                <MicOff className="w-8 h-8" />
+                <MicOff className="w-12 h-12" />
               </Button>
             </div>
             
             {transcript && (
-              <div className="bg-[#33FEBF]/20 p-6 rounded-lg border border-[#33FEBF] max-w-lg mx-auto">
-                <p className="text-sm text-[#141E28] mb-2">Recognized:</p>
-                <p className="text-xl text-[#141E28] font-medium">{transcript}</p>
+              <div className="bg-[#33FEBF]/20 p-8 rounded-xl border-2 border-[#33FEBF] max-w-2xl mx-auto">
+                <p className="text-lg text-[#141E28] mb-4 font-medium">Recognized:</p>
+                <p className="text-2xl text-[#141E28] font-bold">{transcript}</p>
               </div>
             )}
             
-            <div className="mt-8">
-              <div className="inline-flex items-center space-x-2 bg-[#33FEBF]/20 px-6 py-3 rounded-full">
-                <div className="w-3 h-3 bg-[#33FEBF] rounded-full animate-bounce"></div>
-                <span className="text-[#33FEBF] text-lg font-medium">Listening...</span>
+            <div className="mt-12">
+              <div className="inline-flex items-center space-x-3 bg-[#33FEBF]/20 px-8 py-4 rounded-full">
+                <div className="w-4 h-4 bg-[#33FEBF] rounded-full animate-bounce"></div>
+                <span className="text-[#33FEBF] text-xl font-semibold">Listening...</span>
               </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* Normal input interface */}
-      <div className="space-y-4">
-        <div className="flex items-center space-x-2">
-          <Input
-            value={value || transcript}
-            onChange={(e) => onChange(e.target.value)}
-            placeholder={placeholder}
-            className="flex-1 border-[#33FEBF] focus:ring-[#33FEBF] text-lg p-4"
-          />
-          <Button
-            type="button"
-            variant="outline"
-            size="icon"
-            onClick={playText}
-            disabled={!value && !transcript}
-            className="border-[#33FEBF] text-[#33FEBF] hover:bg-[#33FEBF] hover:text-white h-12 w-12"
-          >
-            <Volume2 className="w-5 h-5" />
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            size="icon"
-            onClick={playQuestion}
-            className="border-[#33FEBF] text-[#33FEBF] hover:bg-[#33FEBF] hover:text-white h-12 w-12"
-            title="Listen to question"
-          >
-            <Volume2 className="w-5 h-5" />
-          </Button>
-        </div>
-        
-        <div className="flex justify-center">
-          <Button
-            type="button"
-            onClick={isListening ? stopListening : startListening}
-            className="w-20 h-20 rounded-full bg-[#33FEBF] hover:bg-[#33FEBF]/90 text-[#141E28]"
-          >
-            <Mic className="w-8 h-8" />
-          </Button>
-        </div>
-        
-        {showSuggestion && (
-          <div className="bg-[#33FEBF]/10 border border-[#33FEBF] p-4 rounded-lg">
-            <p className="text-sm text-[#141E28] mb-2">Auto-correction suggestion:</p>
-            <div className="flex items-center justify-between">
-              <p className="text-[#141E28] font-medium">{suggestion}</p>
-              <div className="flex space-x-2">
-                <Button size="sm" onClick={acceptSuggestion} className="bg-[#33FEBF] hover:bg-[#33FEBF]/90 text-[#141E28]">
-                  <Check className="w-4 h-4 mr-1" />
-                  Accept
+      {/* Full screen input interface when not listening */}
+      {!isListening && (
+        <div className="fixed inset-0 bg-white z-40 flex items-center justify-center p-8">
+          <div className="w-full max-w-4xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-[#141E28] mb-4">
+                {field.label}
+              </h2>
+            </div>
+
+            <div className="space-y-8">
+              <div className="flex items-center space-x-4">
+                <Input
+                  value={value || transcript}
+                  onChange={(e) => onChange(e.target.value)}
+                  placeholder={placeholder}
+                  className="flex-1 border-2 border-[#33FEBF] focus:ring-[#33FEBF] text-xl p-6 rounded-xl"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={playText}
+                  disabled={!value && !transcript}
+                  className="border-2 border-[#33FEBF] text-[#33FEBF] hover:bg-[#33FEBF] hover:text-white h-16 w-16 rounded-xl"
+                >
+                  <Volume2 className="w-6 h-6" />
                 </Button>
-                <Button size="sm" variant="outline" onClick={rejectSuggestion} className="border-[#33FEBF] text-[#33FEBF]">
-                  <X className="w-4 h-4 mr-1" />
-                  Reject
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={playQuestion}
+                  className="border-2 border-[#33FEBF] text-[#33FEBF] hover:bg-[#33FEBF] hover:text-white h-16 w-16 rounded-xl"
+                  title="Listen to question"
+                >
+                  <Volume2 className="w-6 h-6" />
                 </Button>
               </div>
+              
+              <div className="flex justify-center">
+                <Button
+                  type="button"
+                  onClick={isListening ? stopListening : startListening}
+                  className="w-24 h-24 rounded-full bg-[#33FEBF] hover:bg-[#33FEBF]/90 text-[#141E28]"
+                >
+                  <Mic className="w-10 h-10" />
+                </Button>
+              </div>
+              
+              {showSuggestion && (
+                <div className="bg-[#33FEBF]/10 border-2 border-[#33FEBF] p-6 rounded-xl max-w-2xl mx-auto">
+                  <p className="text-lg text-[#141E28] mb-4 font-medium">Auto-correction suggestion:</p>
+                  <div className="flex items-center justify-between">
+                    <p className="text-[#141E28] font-semibold text-xl">{suggestion}</p>
+                    <div className="flex space-x-3">
+                      <Button size="lg" onClick={acceptSuggestion} className="bg-[#33FEBF] hover:bg-[#33FEBF]/90 text-[#141E28]">
+                        <Check className="w-5 h-5 mr-2" />
+                        Accept
+                      </Button>
+                      <Button size="lg" variant="outline" onClick={rejectSuggestion} className="border-2 border-[#33FEBF] text-[#33FEBF]">
+                        <X className="w-5 h-5 mr-2" />
+                        Reject
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </>
   );
 };

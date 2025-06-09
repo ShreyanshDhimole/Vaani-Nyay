@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,6 +5,7 @@ import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import VoiceInput from './VoiceInput';
 import VoterIdPreview from './VoterIdPreview';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface FormData {
   assemblyConstituencyNo: string;
@@ -40,6 +40,7 @@ interface FormData {
 
 const VoterIdForm = () => {
   const navigate = useNavigate();
+  const { translate } = useLanguage();
   const [currentStep, setCurrentStep] = useState(0);
   const [showPreview, setShowPreview] = useState(false);
   const [formData, setFormData] = useState<FormData>({
@@ -189,7 +190,7 @@ const VoterIdForm = () => {
             className="mb-4 border-[#33FEBF] text-[#33FEBF] hover:bg-[#33FEBF] hover:text-[#141E28]"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Forms
+            {translate('button.back')}
           </Button>
           
           <div className="bg-[#33FEBF] text-[#141E28] p-2 rounded mb-4">
@@ -208,7 +209,7 @@ const VoterIdForm = () => {
         <Card className="shadow-lg border border-[#33FEBF] bg-white">
           <CardHeader className="bg-[#33FEBF] text-[#141E28]">
             <CardTitle className="text-xl text-center">
-              Voter Application Form - Election Commission of India (Form-8)
+              {translate('forms.voterId')} - Election Commission of India (Form-8)
             </CardTitle>
           </CardHeader>
           
@@ -279,14 +280,14 @@ const VoterIdForm = () => {
                   className="border-[#33FEBF] text-[#33FEBF] hover:bg-[#33FEBF] hover:text-[#141E28]"
                 >
                   <ArrowLeft className="w-4 h-4 mr-2" />
-                  Previous
+                  {translate('button.previous')}
                 </Button>
                 
                 <Button 
                   onClick={nextStep} 
                   className="bg-[#33FEBF] hover:bg-[#33FEBF]/90 text-[#141E28]"
                 >
-                  {currentStep === formFields.length - 1 ? 'Preview Form' : 'Next'}
+                  {currentStep === formFields.length - 1 ? translate('button.preview') : translate('button.next')}
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </div>

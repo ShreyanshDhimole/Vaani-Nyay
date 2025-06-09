@@ -1,9 +1,10 @@
-
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Download, Send } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import CharacterBoxes from './CharacterBoxes';
+import { generateVoterIdPDF } from '@/services/pdfService';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface FormData {
   assemblyConstituencyNo: string;
@@ -43,6 +44,8 @@ interface VoterIdPreviewProps {
 }
 
 const VoterIdPreview = ({ formData, onBack, onEdit }: VoterIdPreviewProps) => {
+  const { translate } = useLanguage();
+
   const handleSubmit = () => {
     toast({
       title: "Form Submitted Successfully!",
@@ -51,10 +54,19 @@ const VoterIdPreview = ({ formData, onBack, onEdit }: VoterIdPreviewProps) => {
   };
 
   const handleDownload = () => {
-    toast({
-      title: "Download Started",
-      description: "Your form is being downloaded as PDF.",
-    });
+    try {
+      generateVoterIdPDF(formData);
+      toast({
+        title: "Download Started",
+        description: "Your form is being downloaded as PDF.",
+      });
+    } catch (error) {
+      toast({
+        title: "Download Failed", 
+        description: "There was an error generating the PDF. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -67,7 +79,7 @@ const VoterIdPreview = ({ formData, onBack, onEdit }: VoterIdPreviewProps) => {
             className="mb-4 border-[#33FEBF] text-[#33FEBF] hover:bg-[#33FEBF] hover:text-[#141E28]"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Form
+            {translate('button.back')}
           </Button>
         </div>
 
@@ -333,14 +345,14 @@ const VoterIdPreview = ({ formData, onBack, onEdit }: VoterIdPreviewProps) => {
                 className="border-[#33FEBF] text-[#33FEBF] hover:bg-[#33FEBF] hover:text-[#141E28]"
               >
                 <Download className="w-4 h-4 mr-2" />
-                Download PDF
+                {translate('button.download')}
               </Button>
               <Button 
                 onClick={handleSubmit} 
                 className="bg-[#33FEBF] hover:bg-[#33FEBF]/90 text-[#141E28]"
               >
                 <Send className="w-4 h-4 mr-2" />
-                Submit Form
+                {translate('button.submit')}
               </Button>
             </div>
           </CardContent>
