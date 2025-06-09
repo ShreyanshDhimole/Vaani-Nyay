@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -180,6 +181,24 @@ const VoterIdForm = () => {
     );
   }
 
+  // For voice input fields, use full screen
+  if (!['radio', 'checkbox'].includes(currentField.type)) {
+    return (
+      <VoiceInput
+        value={getCurrentValue(currentField.key)}
+        onChange={(value) => handleInputChange(currentField.key, value)}
+        placeholder={`Enter ${currentField.label.toLowerCase()}`}
+        field={currentField}
+        onNext={nextStep}
+        onPrevious={prevStep}
+        canGoNext={true}
+        canGoPrevious={currentStep > 0}
+        isLastField={currentStep === formFields.length - 1}
+      />
+    );
+  }
+
+  // For radio and checkbox fields, use the regular form layout
   return (
     <div className="min-h-screen bg-[#141E28] p-4">
       <div className="max-w-4xl mx-auto">
@@ -261,15 +280,6 @@ const VoterIdForm = () => {
                     </label>
                   ))}
                 </div>
-              )}
-
-              {!['radio', 'checkbox'].includes(currentField.type) && (
-                <VoiceInput
-                  value={getCurrentValue(currentField.key)}
-                  onChange={(value) => handleInputChange(currentField.key, value)}
-                  placeholder={`Enter ${currentField.label.toLowerCase()}`}
-                  field={currentField}
-                />
               )}
 
               <div className="flex justify-between pt-6 border-t border-gray-200">

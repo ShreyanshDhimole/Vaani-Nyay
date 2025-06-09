@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Mic, MicOff, Volume2, Check, X } from 'lucide-react';
+import { Mic, MicOff, Volume2, Check, X, ArrowLeft, ArrowRight } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -15,9 +15,24 @@ interface VoiceInputProps {
     type: string;
     options?: string[];
   };
+  onNext?: () => void;
+  onPrevious?: () => void;
+  canGoNext?: boolean;
+  canGoPrevious?: boolean;
+  isLastField?: boolean;
 }
 
-const VoiceInput = ({ value, onChange, placeholder, field }: VoiceInputProps) => {
+const VoiceInput = ({ 
+  value, 
+  onChange, 
+  placeholder, 
+  field, 
+  onNext, 
+  onPrevious, 
+  canGoNext = true, 
+  canGoPrevious = true,
+  isLastField = false 
+}: VoiceInputProps) => {
   const { translate } = useLanguage();
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
@@ -203,72 +218,98 @@ const VoiceInput = ({ value, onChange, placeholder, field }: VoiceInputProps) =>
 
       {/* Full screen input interface when not listening */}
       {!isListening && (
-        <div className="fixed inset-0 bg-white z-40 flex items-center justify-center p-8">
-          <div className="w-full max-w-4xl mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-[#141E28] mb-4">
+        <div className="fixed inset-0 bg-white z-40 flex flex-col">
+          {/* Header with navigation */}
+          <div className="bg-[#33FEBF] text-[#141E28] p-4">
+            <div className="max-w-4xl mx-auto flex justify-between items-center">
+              <Button
+                variant="ghost"
+                onClick={onPrevious}
+                disabled={!canGoPrevious}
+                className="text-[#141E28] hover:bg-[#141E28] hover:text-[#33FEBF]"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                {translate('button.previous')}
+              </Button>
+              
+              <h2 className="text-xl font-bold text-center flex-1">
                 {field.label}
               </h2>
+              
+              <Button
+                variant="ghost"
+                onClick={onNext}
+                disabled={!canGoNext}
+                className="text-[#141E28] hover:bg-[#141E28] hover:text-[#33FEBF]"
+              >
+                {isLastField ? translate('button.preview') : translate('button.next')}
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
             </div>
+          </div>
 
-            <div className="space-y-8">
-              <div className="flex items-center space-x-4">
-                <Input
-                  value={value || transcript}
-                  onChange={(e) => onChange(e.target.value)}
-                  placeholder={placeholder}
-                  className="flex-1 border-2 border-[#33FEBF] focus:ring-[#33FEBF] text-xl p-6 rounded-xl"
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  onClick={playText}
-                  disabled={!value && !transcript}
-                  className="border-2 border-[#33FEBF] text-[#33FEBF] hover:bg-[#33FEBF] hover:text-white h-16 w-16 rounded-xl"
-                >
-                  <Volume2 className="w-6 h-6" />
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  onClick={playQuestion}
-                  className="border-2 border-[#33FEBF] text-[#33FEBF] hover:bg-[#33FEBF] hover:text-white h-16 w-16 rounded-xl"
-                  title="Listen to question"
-                >
-                  <Volume2 className="w-6 h-6" />
-                </Button>
-              </div>
-              
-              <div className="flex justify-center">
-                <Button
-                  type="button"
-                  onClick={isListening ? stopListening : startListening}
-                  className="w-24 h-24 rounded-full bg-[#33FEBF] hover:bg-[#33FEBF]/90 text-[#141E28]"
-                >
-                  <Mic className="w-10 h-10" />
-                </Button>
-              </div>
-              
-              {showSuggestion && (
-                <div className="bg-[#33FEBF]/10 border-2 border-[#33FEBF] p-6 rounded-xl max-w-2xl mx-auto">
-                  <p className="text-lg text-[#141E28] mb-4 font-medium">Auto-correction suggestion:</p>
-                  <div className="flex items-center justify-between">
-                    <p className="text-[#141E28] font-semibold text-xl">{suggestion}</p>
-                    <div className="flex space-x-3">
-                      <Button size="lg" onClick={acceptSuggestion} className="bg-[#33FEBF] hover:bg-[#33FEBF]/90 text-[#141E28]">
-                        <Check className="w-5 h-5 mr-2" />
-                        Accept
-                      </Button>
-                      <Button size="lg" variant="outline" onClick={rejectSuggestion} className="border-2 border-[#33FEBF] text-[#33FEBF]">
-                        <X className="w-5 h-5 mr-2" />
-                        Reject
-                      </Button>
+          {/* Main content area */}
+          <div className="flex-1 flex items-center justify-center p-8">
+            <div className="w-full max-w-4xl mx-auto">
+              <div className="space-y-8">
+                <div className="flex items-center space-x-4">
+                  <Input
+                    value={value || transcript}
+                    onChange={(e) => onChange(e.target.value)}
+                    placeholder={placeholder}
+                    className="flex-1 border-2 border-[#33FEBF] focus:ring-[#33FEBF] text-xl p-6 rounded-xl"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={playText}
+                    disabled={!value && !transcript}
+                    className="border-2 border-[#33FEBF] text-[#33FEBF] hover:bg-[#33FEBF] hover:text-white h-16 w-16 rounded-xl"
+                  >
+                    <Volume2 className="w-6 h-6" />
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={playQuestion}
+                    className="border-2 border-[#33FEBF] text-[#33FEBF] hover:bg-[#33FEBF] hover:text-white h-16 w-16 rounded-xl"
+                    title="Listen to question"
+                  >
+                    <Volume2 className="w-6 h-6" />
+                  </Button>
+                </div>
+                
+                <div className="flex justify-center">
+                  <Button
+                    type="button"
+                    onClick={isListening ? stopListening : startListening}
+                    className="w-24 h-24 rounded-full bg-[#33FEBF] hover:bg-[#33FEBF]/90 text-[#141E28]"
+                  >
+                    <Mic className="w-10 h-10" />
+                  </Button>
+                </div>
+                
+                {showSuggestion && (
+                  <div className="bg-[#33FEBF]/10 border-2 border-[#33FEBF] p-6 rounded-xl max-w-2xl mx-auto">
+                    <p className="text-lg text-[#141E28] mb-4 font-medium">Auto-correction suggestion:</p>
+                    <div className="flex items-center justify-between">
+                      <p className="text-[#141E28] font-semibold text-xl">{suggestion}</p>
+                      <div className="flex space-x-3">
+                        <Button size="lg" onClick={acceptSuggestion} className="bg-[#33FEBF] hover:bg-[#33FEBF]/90 text-[#141E28]">
+                          <Check className="w-5 h-5 mr-2" />
+                          Accept
+                        </Button>
+                        <Button size="lg" variant="outline" onClick={rejectSuggestion} className="border-2 border-[#33FEBF] text-[#33FEBF]">
+                          <X className="w-5 h-5 mr-2" />
+                          Reject
+                        </Button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </div>
         </div>
