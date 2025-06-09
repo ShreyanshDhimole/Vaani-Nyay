@@ -1,6 +1,7 @@
 
 import { useParams } from 'react-router-dom';
 import BankAccountForm from '@/components/BankAccountForm';
+import VoterIdForm from '@/components/VoterIdForm';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Construction } from 'lucide-react';
@@ -12,6 +13,10 @@ const FormPage = () => {
 
   if (formId === 'bank-account') {
     return <BankAccountForm />;
+  }
+
+  if (formId === 'voter-id') {
+    return <VoterIdForm />;
   }
 
   // Placeholder for other forms
