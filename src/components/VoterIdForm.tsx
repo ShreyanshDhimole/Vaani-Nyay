@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -44,6 +43,7 @@ const VoterIdForm = () => {
   const { translate } = useLanguage();
   const [currentStep, setCurrentStep] = useState(0);
   const [showPreview, setShowPreview] = useState(false);
+  const [editingField, setEditingField] = useState<string | null>(null);
   const [formData, setFormData] = useState<FormData>({
     assemblyConstituencyNo: '',
     assemblyConstituencyName: '',
@@ -150,6 +150,16 @@ const VoterIdForm = () => {
   };
 
   const nextStep = () => {
+    if (editingField) {
+      // If we're editing a field, confirm and go back to preview
+      const confirmed = window.confirm(translate('confirm.saveChanges') || 'Save changes and return to preview?');
+      if (confirmed) {
+        setEditingField(null);
+        setShowPreview(true);
+      }
+      return;
+    }
+
     if (currentStep < formFields.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
@@ -166,6 +176,15 @@ const VoterIdForm = () => {
     }
   };
 
+  const handleEdit = (field: string) => {
+    const fieldIndex = formFields.findIndex(f => f.key === field);
+    if (fieldIndex !== -1) {
+      setCurrentStep(fieldIndex);
+      setShowPreview(false);
+      setEditingField(field);
+    }
+  };
+
   const currentField = formFields[currentStep];
 
   if (showPreview) {
@@ -173,13 +192,7 @@ const VoterIdForm = () => {
       <VoterIdPreview
         formData={formData}
         onBack={prevStep}
-        onEdit={(field: string) => {
-          const fieldIndex = formFields.findIndex(f => f.key === field);
-          if (fieldIndex !== -1) {
-            setCurrentStep(fieldIndex);
-            setShowPreview(false);
-          }
-        }}
+        onEdit={handleEdit}
       />
     );
   }
@@ -190,12 +203,12 @@ const VoterIdForm = () => {
       <VoiceInput
         value={getCurrentValue(currentField.key)}
         onChange={(value) => handleInputChange(currentField.key, value)}
-        placeholder={`Enter ${currentField.label.toLowerCase()}`}
+        placeholder={`${translate('enter.label') || 'Enter'} ${currentField.label.toLowerCase()}`}
         field={currentField}
         onNext={nextStep}
         onPrevious={prevStep}
         canGoNext={true}
-        canGoPrevious={currentStep > 0 || showPreview}
+        canGoPrevious={currentStep > 0 || showPreview || editingField !== null}
         isLastField={currentStep === formFields.length - 1}
       />
     );
@@ -217,7 +230,7 @@ const VoterIdForm = () => {
           
           <div className="bg-[#33FEBF] text-[#141E28] p-2 rounded mb-4">
             <p className="text-sm font-medium">
-              Step {currentStep + 1} of {formFields.length} - {currentField.section.toUpperCase()} SECTION
+              {translate('step.label') || 'Step'} {currentStep + 1} {translate('of.label') || 'of'} {formFields.length} - {currentField.section.toUpperCase()} {translate('section.label') || 'SECTION'}
             </p>
             <div className="w-full bg-[#141E28] rounded-full h-2 mt-2">
               <div 
@@ -231,7 +244,7 @@ const VoterIdForm = () => {
         <Card className="shadow-lg border border-[#33FEBF] bg-white">
           <CardHeader className="bg-[#33FEBF] text-[#141E28]">
             <CardTitle className="text-xl text-center">
-              {translate('forms.voterId')} - Election Commission of India (Form-8)
+              {translate('forms.voterId')} - {translate('form.subtitle') || 'Election Commission of India (Form-8)'}
             </CardTitle>
           </CardHeader>
           
@@ -300,7 +313,7 @@ const VoterIdForm = () => {
                   onClick={nextStep} 
                   className="bg-[#33FEBF] hover:bg-[#33FEBF]/90 text-[#141E28]"
                 >
-                  {currentStep === formFields.length - 1 ? translate('button.preview') : translate('button.next')}
+                  {currentStep === formFields.length - 1 ? (translate('button.preview') || 'Preview') : (translate('button.next') || 'Next')}
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </div>

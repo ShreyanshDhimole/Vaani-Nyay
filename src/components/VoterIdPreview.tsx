@@ -48,8 +48,8 @@ const VoterIdPreview = ({ formData, onBack, onEdit }: VoterIdPreviewProps) => {
 
   const handleSubmit = () => {
     toast({
-      title: "Form Submitted Successfully!",
-      description: "Your voter ID application has been submitted for processing.",
+      title: translate('toast.submitSuccess') || "Form Submitted Successfully!",
+      description: translate('toast.submitDescription') || "Your voter ID application has been submitted for processing.",
     });
   };
 
@@ -57,13 +57,13 @@ const VoterIdPreview = ({ formData, onBack, onEdit }: VoterIdPreviewProps) => {
     try {
       generateVoterIdPDF(formData);
       toast({
-        title: "Download Started",
-        description: "Your form is being downloaded as PDF.",
+        title: translate('toast.downloadStarted') || "Download Started",
+        description: translate('toast.downloadDescription') || "Your form is being downloaded as PDF.",
       });
     } catch (error) {
       toast({
-        title: "Download Failed", 
-        description: "There was an error generating the PDF. Please try again.",
+        title: translate('toast.downloadFailed') || "Download Failed", 
+        description: translate('toast.downloadError') || "There was an error generating the PDF. Please try again.",
         variant: "destructive",
       });
     }
@@ -91,22 +91,22 @@ const VoterIdPreview = ({ formData, onBack, onEdit }: VoterIdPreviewProps) => {
                   <img src="/lovable-uploads/d3aeee09-31ae-4fd2-b005-ed8ee73cb35a.png" alt="ECI Logo" className="w-12 h-12" />
                 </div>
                 <div className="flex-1 text-center">
-                  <p className="text-sm font-medium">Date of Notification:</p>
+                  <p className="text-sm font-medium">{translate('preview.dateNotification') || 'Date of Notification:'}</p>
                   <CardTitle className="text-lg font-bold mt-2">
-                    ELECTION COMMISSION OF INDIA
+                    {translate('preview.electionCommission') || 'ELECTION COMMISSION OF INDIA'}
                   </CardTitle>
-                  <p className="text-sm font-medium">Form-8</p>
+                  <p className="text-sm font-medium">{translate('preview.form8') || 'Form-8'}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm">FORM No.</p>
-                  <p className="text-xs">(To be filled by office)</p>
+                  <p className="text-sm">{translate('preview.formNo') || 'FORM No.'}</p>
+                  <p className="text-xs">{translate('preview.filledByOffice') || '(To be filled by office)'}</p>
                 </div>
               </div>
               <p className="text-sm font-medium">
-                Voter Application Form for Shifting of Residence/Correction of Entries in Existing Electoral Roll/Replacement of EPIC/Marking of PwD
+                {translate('preview.formTitle') || 'Voter Application Form for Shifting of Residence/Correction of Entries in Existing Electoral Roll/Replacement of EPIC/Marking of PwD'}
               </p>
               <p className="text-xs">
-                (See Rules 13(3) and (26) of the Registration of Electors Rules, 1960)
+                {translate('preview.rules') || '(See Rules 13(3) and (26) of the Registration of Electors Rules, 1960)'}
               </p>
             </div>
           </CardHeader>
@@ -114,26 +114,26 @@ const VoterIdPreview = ({ formData, onBack, onEdit }: VoterIdPreviewProps) => {
           <CardContent className="p-6 space-y-6 bg-white">
             {/* Address Section */}
             <div className="border border-black">
-              <div className="bg-gray-100 p-2 text-sm font-medium">To,</div>
+              <div className="bg-gray-100 p-2 text-sm font-medium">{translate('preview.to')}</div>
               <div className="p-4 space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <span className="text-sm">The Electoral Registration Officer,</span><br/>
-                    <span className="text-sm">No. & Name of Assembly Constituency</span>
+                    <span className="text-sm">{translate('preview.electoralOfficer')}</span><br/>
+                    <span className="text-sm">{translate('preview.assemblyConstituency')}</span>
                     <div className="flex items-center space-x-2 mt-1">
-                      <span className="text-sm">No.</span>
+                      <span className="text-sm">{translate('preview.no') || 'No.'}</span>
                       <CharacterBoxes text={formData.assemblyConstituencyNo} maxLength={3} onEdit={() => onEdit('assemblyConstituencyNo')} />
-                      <span className="text-sm ml-4">Name</span>
+                      <span className="text-sm ml-4">{translate('preview.name') || 'Name'}</span>
                       <CharacterBoxes text={formData.assemblyConstituencyName} maxLength={25} onEdit={() => onEdit('assemblyConstituencyName')} />
                     </div>
                   </div>
                   <div>
-                    <span className="text-sm">Or No. & Name of Parliamentary Constituency@</span><br/>
-                    <span className="text-xs">(# only for Union Territories not having Legislative Assembly)</span>
+                    <span className="text-sm">{translate('preview.parliamentaryConstituency')}</span><br/>
+                    <span className="text-xs">{translate('preview.unionTerritory')}</span>
                     <div className="flex items-center space-x-2 mt-1">
-                      <span className="text-sm">No.</span>
+                      <span className="text-sm">{translate('preview.no') || 'No.'}</span>
                       <CharacterBoxes text={formData.parliamentaryConstituencyNo} maxLength={3} onEdit={() => onEdit('parliamentaryConstituencyNo')} />
-                      <span className="text-sm ml-4">Name</span>
+                      <span className="text-sm ml-4">{translate('preview.name') || 'Name'}</span>
                       <CharacterBoxes text={formData.parliamentaryConstituencyName} maxLength={25} onEdit={() => onEdit('parliamentaryConstituencyName')} />
                     </div>
                   </div>
@@ -145,7 +145,7 @@ const VoterIdPreview = ({ formData, onBack, onEdit }: VoterIdPreviewProps) => {
             <div className="border border-black">
               <div className="p-4">
                 <div className="flex items-center space-x-2 mb-4">
-                  <span className="text-sm font-medium">(i) Name of the applicant</span>
+                  <span className="text-sm font-medium">{translate('preview.applicantName')}</span>
                   <CharacterBoxes text={formData.applicantName} maxLength={30} onEdit={() => onEdit('applicantName')} />
                 </div>
               </div>
@@ -155,26 +155,26 @@ const VoterIdPreview = ({ formData, onBack, onEdit }: VoterIdPreviewProps) => {
             <div className="border border-black">
               <div className="p-4 space-y-4">
                 <div>
-                  <span className="text-sm font-medium">EPIC No.</span>
+                  <span className="text-sm font-medium">{translate('preview.epicNo')}</span>
                   <div className="mt-2">
                     <CharacterBoxes text={formData.epicNo} maxLength={10} onEdit={() => onEdit('epicNo')} />
                   </div>
                 </div>
                 
                 <div>
-                  <span className="text-sm font-medium">Aadhaar Details :- (Please tick the appropriate box)</span>
+                  <span className="text-sm font-medium">{translate('preview.aadhaarDetails')}</span>
                   <div className="mt-2 space-y-2">
                     <div className="flex items-center space-x-2">
                       <span className="text-sm">(a)</span>
                       <input type="checkbox" checked={!!formData.aadhaarNumber} readOnly />
-                      <span className="text-sm">Aadhaar Number</span>
+                      <span className="text-sm">{translate('preview.aadhaarNumber')}</span>
                       <CharacterBoxes text={formData.aadhaarNumber} maxLength={12} onEdit={() => onEdit('aadhaarNumber')} />
-                      <span className="text-sm">or</span>
+                      <span className="text-sm">{translate('preview.or') || 'or'}</span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <span className="text-sm">(b)</span>
                       <input type="checkbox" checked={formData.noAadhaar} readOnly />
-                      <span className="text-sm">I am not able to furnish my Aadhaar Number because I don't have Aadhaar Number.</span>
+                      <span className="text-sm">{translate('preview.noAadhaar')}</span>
                     </div>
                   </div>
                 </div>
@@ -185,35 +185,35 @@ const VoterIdPreview = ({ formData, onBack, onEdit }: VoterIdPreviewProps) => {
             <div className="border border-black">
               <div className="p-4 space-y-4">
                 <div>
-                  <span className="text-sm font-medium">Mobile No. of Self (or)</span>
+                  <span className="text-sm font-medium">{translate('preview.mobileNoSelf')}</span>
                   <div className="mt-1">
                     <CharacterBoxes text={formData.mobileNoSelf} maxLength={10} onEdit={() => onEdit('mobileNoSelf')} />
                   </div>
                 </div>
                 <div>
-                  <span className="text-sm font-medium">Mobile No. of Father/Mother/Any other relative (if available)</span>
+                  <span className="text-sm font-medium">{translate('preview.mobileNoRelative')}</span>
                   <div className="mt-1">
                     <CharacterBoxes text={formData.mobileNoRelative} maxLength={10} onEdit={() => onEdit('mobileNoRelative')} />
                   </div>
                 </div>
                 <div>
-                  <span className="text-sm font-medium">Email Id of Self (or)</span>
+                  <span className="text-sm font-medium">{translate('preview.emailSelf')}</span>
                   <div className="mt-1 border-b border-black pb-1">
                     <span className="text-sm">{formData.emailSelf}</span>
                     {formData.emailSelf && (
                       <button onClick={() => onEdit('emailSelf')} className="ml-2 text-[#33FEBF] text-xs underline">
-                        Edit
+                        {translate('preview.edit')}
                       </button>
                     )}
                   </div>
                 </div>
                 <div>
-                  <span className="text-sm font-medium">Email Id of Father/Mother/Any other relative (if available)</span>
+                  <span className="text-sm font-medium">{translate('preview.emailRelative')}</span>
                   <div className="mt-1 border-b border-black pb-1">
                     <span className="text-sm">{formData.emailRelative}</span>
                     {formData.emailRelative && (
                       <button onClick={() => onEdit('emailRelative')} className="ml-2 text-[#33FEBF] text-xs underline">
-                        Edit
+                        {translate('preview.edit')}
                       </button>
                     )}
                   </div>
@@ -224,27 +224,27 @@ const VoterIdPreview = ({ formData, onBack, onEdit }: VoterIdPreviewProps) => {
             {/* Application Type */}
             <div className="border border-black">
               <div className="p-4">
-                <div className="text-sm font-medium mb-2">(ii) I submit application for (Tick any one of the following)</div>
+                <div className="text-sm font-medium mb-2">{translate('preview.applicationType')}</div>
                 <div className="grid grid-cols-2 gap-2">
                   <div className="flex items-center space-x-2">
                     <span className="text-sm">1.</span>
                     <input type="checkbox" checked={formData.applicationType === 'Shifting of Residence'} readOnly />
-                    <span className="text-sm">Shifting of Residence (or)</span>
+                    <span className="text-sm">{translate('appType.shifting') || 'Shifting of Residence (or)'}</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <span className="text-sm">2.</span>
                     <input type="checkbox" checked={formData.applicationType === 'Correction of Entries in Existing Electoral Roll'} readOnly />
-                    <span className="text-sm">Correction of Entries in Existing Electoral Roll (or)</span>
+                    <span className="text-sm">{translate('appType.correction') || 'Correction of Entries in Existing Electoral Roll (or)'}</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <span className="text-sm">3.</span>
                     <input type="checkbox" checked={formData.applicationType === 'Issue of Replacement EPIC without correction'} readOnly />
-                    <span className="text-sm">Issue of Replacement EPIC without correction (or)</span>
+                    <span className="text-sm">{translate('appType.replacement') || 'Issue of Replacement EPIC without correction (or)'}</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <span className="text-sm">4.</span>
                     <input type="checkbox" checked={formData.applicationType === 'Request for marking as Person with Disability'} readOnly />
-                    <span className="text-sm">Request for marking as Person with Disability</span>
+                    <span className="text-sm">{translate('appType.disability') || 'Request for marking as Person with Disability'}</span>
                   </div>
                 </div>
               </div>
@@ -253,41 +253,41 @@ const VoterIdPreview = ({ formData, onBack, onEdit }: VoterIdPreviewProps) => {
             {/* Present Address */}
             <div className="border border-black">
               <div className="p-4">
-                <div className="text-sm font-medium mb-4">Present Address</div>
+                <div className="text-sm font-medium mb-4">{translate('preview.presentAddress')}</div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-3">
                     <div>
-                      <span className="text-sm">House/Building/Apartment No.</span>
+                      <span className="text-sm">{translate('preview.houseNo')}</span>
                       <CharacterBoxes text={formData.presentAddress.houseNo} maxLength={15} onEdit={() => onEdit('presentAddress.houseNo')} />
                     </div>
                     <div>
-                      <span className="text-sm">Town/Village</span>
+                      <span className="text-sm">{translate('preview.townVillage')}</span>
                       <CharacterBoxes text={formData.presentAddress.townVillage} maxLength={20} onEdit={() => onEdit('presentAddress.townVillage')} />
                     </div>
                     <div>
-                      <span className="text-sm">PIN Code</span>
+                      <span className="text-sm">{translate('preview.pinCode')}</span>
                       <CharacterBoxes text={formData.presentAddress.pinCode} maxLength={6} onEdit={() => onEdit('presentAddress.pinCode')} />
                     </div>
                     <div>
-                      <span className="text-sm">District</span>
+                      <span className="text-sm">{translate('preview.district')}</span>
                       <CharacterBoxes text={formData.presentAddress.district} maxLength={20} onEdit={() => onEdit('presentAddress.district')} />
                     </div>
                   </div>
                   <div className="space-y-3">
                     <div>
-                      <span className="text-sm">Street/Area/Locality/Mohalla/Road</span>
+                      <span className="text-sm">{translate('preview.streetArea')}</span>
                       <CharacterBoxes text={formData.presentAddress.streetArea} maxLength={25} onEdit={() => onEdit('presentAddress.streetArea')} />
                     </div>
                     <div>
-                      <span className="text-sm">Post Office</span>
+                      <span className="text-sm">{translate('preview.postOffice')}</span>
                       <CharacterBoxes text={formData.presentAddress.postOffice} maxLength={20} onEdit={() => onEdit('presentAddress.postOffice')} />
                     </div>
                     <div>
-                      <span className="text-sm">Tehsil/Taluka/Mandal</span>
+                      <span className="text-sm">{translate('preview.tehsilTaluka')}</span>
                       <CharacterBoxes text={formData.presentAddress.tehsilTaluka} maxLength={20} onEdit={() => onEdit('presentAddress.tehsilTaluka')} />
                     </div>
                     <div>
-                      <span className="text-sm">State/UT</span>
+                      <span className="text-sm">{translate('preview.stateUt')}</span>
                       <CharacterBoxes text={formData.presentAddress.stateUt} maxLength={20} onEdit={() => onEdit('presentAddress.stateUt')} />
                     </div>
                   </div>
@@ -299,7 +299,7 @@ const VoterIdPreview = ({ formData, onBack, onEdit }: VoterIdPreviewProps) => {
             <div className="border border-black">
               <div className="p-4">
                 <div className="text-sm font-medium mb-3">
-                  Self-attested copy of address proof either in the name of applicant or anyone of the parents/spouse/adult child, if already enrolled with as elector at the same address (Attach any one of the documents mentioned below *):-
+                  {translate('preview.documents')}
                 </div>
                 <div className="grid grid-cols-2 gap-2 text-xs">
                   {[
@@ -325,11 +325,11 @@ const VoterIdPreview = ({ formData, onBack, onEdit }: VoterIdPreviewProps) => {
                 </div>
                 {formData.otherDocument && (
                   <div className="mt-3">
-                    <span className="text-sm font-medium">Any Other:- (Pl. Specify)</span>
+                    <span className="text-sm font-medium">{translate('preview.otherDocument')}</span>
                     <div className="border-b border-black mt-1 pb-1">
                       <span className="text-sm">{formData.otherDocument}</span>
                       <button onClick={() => onEdit('otherDocument')} className="ml-2 text-[#33FEBF] text-xs underline">
-                        Edit
+                        {translate('preview.edit')}
                       </button>
                     </div>
                   </div>
