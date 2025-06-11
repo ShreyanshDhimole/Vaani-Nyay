@@ -1,3 +1,4 @@
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Download, Send } from 'lucide-react';
@@ -35,6 +36,7 @@ interface FormData {
   };
   documentsAvailable: string[];
   otherDocument: string;
+  uploadedFiles?: File[];
 }
 
 interface VoterIdPreviewProps {
@@ -382,5 +384,3 @@ const VoterIdPreview = ({ formData, onBack, onEdit }: VoterIdPreviewProps) => {
 };
 
 export default VoterIdPreview;
-
-</edits_to_apply>
