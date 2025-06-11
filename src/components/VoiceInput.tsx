@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, ArrowRight, Home, Mic, MicOff, HelpCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { toast } from '@/hooks/use-toast';
 
 interface VoiceInputProps {
   value: string;
@@ -40,6 +41,7 @@ const VoiceInput = ({
   const { translate } = useLanguage();
   const [isListening, setIsListening] = useState(false);
   const [showExample, setShowExample] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const getFieldQuestion = (fieldKey: string) => {
     const questions = {
@@ -223,6 +225,7 @@ const VoiceInput = ({
                   />
                 ) : (
                   <Input
+                    ref={inputRef}
                     type={field.type === 'email' ? 'email' : 'text'}
                     value={value}
                     onChange={(e) => onChange(e.target.value)}

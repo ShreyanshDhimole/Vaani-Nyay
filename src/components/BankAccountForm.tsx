@@ -1,267 +1,322 @@
-
-import { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Progress } from '@/components/ui/progress';
-import { Mic, MicOff, ArrowLeft, ArrowRight, Eye } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import VoiceInput from './VoiceInput';
-import FormPreview from './FormPreview';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Calendar } from "@/components/ui/calendar"
+import { CalendarIcon } from "lucide-react"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import { cn } from "@/lib/utils"
+import { format } from "date-fns"
 
 interface FormData {
-  branchName: string;
-  branchCode: string;
-  customerId: string;
-  accountNo: string;
-  ckyc: string;
-  applicationType: string;
-  name: string;
-  maidenName: string;
-  dateOfBirth: string;
-  gender: string;
-  maritalStatus: string;
-  dependents: string;
-  fatherName: string;
-  motherName: string;
-  spouseName: string;
-  guardianName: string;
-  guardianRelation: string;
-  nationality: string;
-  citizenship: string;
+  accountHolderName: string;
+  dateOfBirth: Date | undefined;
+  mobileNumber: string;
+  emailAddress: string;
+  panNumber: string;
+  aadhaarNumber: string;
+  occupation: string;
+  annualIncome: string;
+  currentAddress: string;
+  permanentAddress: string;
+  nomineName: string;
+  nomineeRelation: string;
+  accountType: string;
+  initialDeposit: number;
+  termsAndConditions: boolean;
 }
 
 const BankAccountForm = () => {
-  const navigate = useNavigate();
-  const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState<FormData>({
-    branchName: '',
-    branchCode: '',
-    customerId: '',
-    accountNo: '',
-    ckyc: '',
-    applicationType: 'New',
-    name: '',
-    maidenName: '',
-    dateOfBirth: '',
-    gender: '',
-    maritalStatus: '',
-    dependents: '',
-    fatherName: '',
-    motherName: '',
-    spouseName: '',
-    guardianName: '',
-    guardianRelation: '',
-    nationality: '',
-    citizenship: ''
+    accountHolderName: '',
+    dateOfBirth: undefined,
+    mobileNumber: '',
+    emailAddress: '',
+    panNumber: '',
+    aadhaarNumber: '',
+    occupation: '',
+    annualIncome: '',
+    currentAddress: '',
+    permanentAddress: '',
+    nomineName: '',
+    nomineeRelation: '',
+    accountType: '',
+    initialDeposit: 0,
+    termsAndConditions: false,
   });
-  const [showPreview, setShowPreview] = useState(false);
-  const [useVoice, setUseVoice] = useState(false);
 
-  const formFields = [
-    { key: 'branchName', label: 'Branch Name', type: 'text', required: true },
-    { key: 'branchCode', label: 'Branch Code', type: 'text', required: true },
-    { key: 'customerId', label: 'Customer ID', type: 'text', required: false },
-    { key: 'ckyc', label: 'CKYC Number', type: 'text', required: true },
-    { key: 'name', label: 'Full Name', type: 'text', required: true },
-    { key: 'maidenName', label: 'Maiden Name (if applicable)', type: 'text', required: false },
-    { key: 'dateOfBirth', label: 'Date of Birth (DD/MM/YYYY)', type: 'date', required: true },
-    { key: 'gender', label: 'Gender', type: 'select', options: ['Male', 'Female', 'Third Gender'], required: true },
-    { key: 'maritalStatus', label: 'Marital Status', type: 'select', options: ['Married', 'Unmarried', 'Others'], required: true },
-    { key: 'dependents', label: 'Number of Dependents', type: 'number', required: false },
-    { key: 'fatherName', label: 'Father\'s Name', type: 'text', required: true },
-    { key: 'motherName', label: 'Mother\'s Name', type: 'text', required: false },
-    { key: 'spouseName', label: 'Spouse Name (if married)', type: 'text', required: false },
-    { key: 'nationality', label: 'Nationality', type: 'select', options: ['In-Indian', 'Others'], required: true },
-    { key: 'citizenship', label: 'Citizenship', type: 'text', required: true }
-  ];
-
-  const currentField = formFields[currentStep];
-  const progress = ((currentStep + 1) / formFields.length) * 100;
-
-  const handleInputChange = (value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      [currentField.key]: value
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prevData => ({
+      ...prevData,
+      [name]: value
     }));
   };
 
-  const handleNext = () => {
-    if (currentStep < formFields.length - 1) {
-      setCurrentStep(currentStep + 1);
-    }
+  const handleSelectChange = (name: string, value: string) => {
+    setFormData(prevData => ({
+      ...prevData,
+      [name]: value
+    }));
   };
 
-  const handlePrevious = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
-    }
+  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = e.target;
+    setFormData(prevData => ({
+      ...prevData,
+      [name]: checked
+    }));
   };
 
-  const handleSubmit = () => {
-    setShowPreview(true);
+  const handleDateChange = (date: Date | undefined) => {
+    setFormData(prevData => ({
+      ...prevData,
+      dateOfBirth: date
+    }));
   };
 
-  const canProceed = () => {
-    if (currentField.required) {
-      return formData[currentField.key as keyof FormData].trim() !== '';
-    }
-    return true;
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log(formData);
+    // Handle form submission logic here
   };
 
-  if (showPreview) {
-    return <FormPreview formData={formData} onBack={() => setShowPreview(false)} onEdit={(field) => {
-      const fieldIndex = formFields.findIndex(f => f.key === field);
-      if (fieldIndex !== -1) {
-        setCurrentStep(fieldIndex);
-        setShowPreview(false);
-      }
-    }} />;
-  }
+  const formFields = [
+    { key: 'accountHolderName', label: 'Account Holder Name', type: 'text', section: 'personal', required: true },
+    { key: 'dateOfBirth', label: 'Date of Birth', type: 'date', section: 'personal', required: true },
+    { key: 'mobileNumber', label: 'Mobile Number', type: 'tel', section: 'contact', required: true },
+    { key: 'emailAddress', label: 'Email Address', type: 'email', section: 'contact', required: true },
+    { key: 'panNumber', label: 'PAN Number', type: 'text', section: 'documents', required: true },
+    { key: 'aadhaarNumber', label: 'Aadhaar Number', type: 'text', section: 'documents', required: true },
+    { key: 'occupation', label: 'Occupation', type: 'select', section: 'personal', options: ['Salaried', 'Self-Employed', 'Business', 'Student', 'Retired', 'Homemaker', 'Other'], required: true },
+    { key: 'annualIncome', label: 'Annual Income', type: 'select', section: 'financial', options: ['Below 1 Lakh', '1-5 Lakhs', '5-10 Lakhs', '10-25 Lakhs', '25-50 Lakhs', 'Above 50 Lakhs'], required: true },
+    { key: 'currentAddress', label: 'Current Address', type: 'textarea', section: 'address', required: true },
+    { key: 'permanentAddress', label: 'Permanent Address', type: 'textarea', section: 'address', required: true },
+    { key: 'nomineName', label: 'Nominee Name', type: 'text', section: 'nominee', required: false },
+    { key: 'nomineeRelation', label: 'Relationship with Nominee', type: 'text', section: 'nominee', required: false },
+    { key: 'accountType', label: 'Account Type', type: 'radio', section: 'account', options: ['Savings', 'Current', 'Fixed Deposit'], required: true },
+    { key: 'initialDeposit', label: 'Initial Deposit Amount', type: 'number', section: 'account', required: true }
+  ];
 
   return (
-    <div className="min-h-screen bg-[#141E28] p-6">
-      <div className="max-w-2xl mx-auto">
-        <div className="mb-6">
-          <Button
-            variant="outline"
-            onClick={() => navigate('/')}
-            className="mb-4 border-[#33FEBF] text-[#33FEBF] hover:bg-[#33FEBF] hover:text-[#141E28]"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Forms
-          </Button>
-          
-          <div className="bg-white rounded-lg p-4 shadow-sm border border-[#33FEBF]">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-sm text-gray-600">
-                Step {currentStep + 1} of {formFields.length}
-              </span>
-              <span className="text-sm font-medium text-[#33FEBF]">
-                {Math.round(progress)}% Complete
-              </span>
-            </div>
-            <Progress value={progress} className="h-2" />
-          </div>
-        </div>
-
-        <Card className="shadow-lg border border-[#33FEBF]">
-          <CardHeader className="bg-[#33FEBF] text-[#141E28] rounded-t-lg">
-            <CardTitle className="text-center">
-              SBI Account Opening Form - Part I
-            </CardTitle>
-            <p className="text-center text-[#141E28]/80 text-sm">
-              Customer Information Sheet (CIF Creation/Amendment)
-            </p>
-          </CardHeader>
-          
-          <CardContent className="p-8 bg-white">
-            <div className="mb-6">
-              <Label className="text-lg font-medium text-[#141E28]">
-                {currentField.label}
-                {currentField.required && <span className="text-red-500 ml-1">*</span>}
-              </Label>
-              <p className="text-sm text-gray-600 mt-1">
-                Field {currentStep + 1} of {formFields.length}
-              </p>
-            </div>
-
-            <div className="mb-6">
-              <div className="flex items-center space-x-4 mb-4">
-                <Button
-                  variant={!useVoice ? "default" : "outline"}
-                  onClick={() => setUseVoice(false)}
-                  className={`flex-1 ${!useVoice ? 'bg-[#33FEBF] text-[#141E28] hover:bg-[#33FEBF]/90' : 'border-[#33FEBF] text-[#33FEBF] hover:bg-[#33FEBF] hover:text-[#141E28]'}`}
-                >
-                  Text Input
-                </Button>
-                <Button
-                  variant={useVoice ? "default" : "outline"}
-                  onClick={() => setUseVoice(true)}
-                  className={`flex-1 ${useVoice ? 'bg-[#33FEBF] text-[#141E28] hover:bg-[#33FEBF]/90' : 'border-[#33FEBF] text-[#33FEBF] hover:bg-[#33FEBF] hover:text-[#141E28]'}`}
-                >
-                  <Mic className="w-4 h-4 mr-2" />
-                  Voice Input
-                </Button>
-              </div>
-
-              {useVoice ? (
-                <VoiceInput
-                  value={formData[currentField.key as keyof FormData]}
-                  onChange={handleInputChange}
-                  placeholder={`Speak your ${currentField.label.toLowerCase()}...`}
-                  field={currentField}
-                />
-              ) : (
+    <div className="min-h-screen bg-gray-100 py-6 flex flex-col justify-center sm:py-12">
+      <div className="relative py-3 sm:max-w-xl sm:mx-auto">
+        <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-sky-500 shadow-lg transform -skew-y-6 sm:skew-y-0 sm:-rotate-6 sm:rounded-3xl"></div>
+        <div className="relative px-4 py-10 bg-white shadow-lg sm:rounded-3xl sm:p-20">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-2xl text-center">Bank Account Opening Form</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
-                  {currentField.type === 'select' ? (
-                    <select
-                      value={formData[currentField.key as keyof FormData]}
-                      onChange={(e) => handleInputChange(e.target.value)}
-                      className="w-full p-3 border border-[#33FEBF] rounded-lg focus:ring-2 focus:ring-[#33FEBF] focus:border-transparent"
-                    >
-                      <option value="">Select {currentField.label}</option>
-                      {currentField.options?.map((option) => (
-                        <option key={option} value={option}>
-                          {option}
-                        </option>
-                      ))}
-                    </select>
-                  ) : (
-                    <Input
-                      type={currentField.type}
-                      value={formData[currentField.key as keyof FormData]}
-                      onChange={(e) => handleInputChange(e.target.value)}
-                      placeholder={`Enter your ${currentField.label.toLowerCase()}`}
-                      className="w-full p-3 text-lg border-[#33FEBF] focus:ring-[#33FEBF]"
-                    />
-                  )}
+                  <Label htmlFor="accountHolderName">Account Holder Name</Label>
+                  <Input
+                    type="text"
+                    id="accountHolderName"
+                    name="accountHolderName"
+                    value={formData.accountHolderName}
+                    onChange={handleInputChange}
+                    required
+                  />
                 </div>
-              )}
-            </div>
-
-            <div className="flex justify-between items-center">
-              <Button
-                variant="outline"
-                onClick={handlePrevious}
-                disabled={currentStep === 0}
-                className="border-[#33FEBF] text-[#33FEBF] hover:bg-[#33FEBF] hover:text-[#141E28] disabled:opacity-50"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Previous
-              </Button>
-
-              <Button
-                onClick={() => setShowPreview(true)}
-                variant="outline"
-                className="text-[#33FEBF] border-[#33FEBF] hover:bg-[#33FEBF] hover:text-[#141E28]"
-              >
-                <Eye className="w-4 h-4 mr-2" />
-                Preview
-              </Button>
-
-              {currentStep === formFields.length - 1 ? (
-                <Button
-                  onClick={handleSubmit}
-                  disabled={!canProceed()}
-                  className="bg-[#33FEBF] hover:bg-[#33FEBF]/90 text-[#141E28] disabled:opacity-50"
-                >
-                  Complete Form
-                </Button>
-              ) : (
-                <Button
-                  onClick={handleNext}
-                  disabled={!canProceed()}
-                  className="bg-[#33FEBF] hover:bg-[#33FEBF]/90 text-[#141E28] disabled:opacity-50"
-                >
-                  Next
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+                <div>
+                  <Label>Date of Birth</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "w-[240px] justify-start text-left font-normal",
+                          !formData.dateOfBirth && "text-muted-foreground"
+                        )}
+                      >
+                        {formData.dateOfBirth ? (
+                          format(formData.dateOfBirth, "PPP")
+                        ) : (
+                          <span>Pick a date</span>
+                        )}
+                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={formData.dateOfBirth}
+                        onSelect={handleDateChange}
+                        disabled={(date) =>
+                          date > new Date() || date < new Date("1900-01-01")
+                        }
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+                <div>
+                  <Label htmlFor="mobileNumber">Mobile Number</Label>
+                  <Input
+                    type="tel"
+                    id="mobileNumber"
+                    name="mobileNumber"
+                    value={formData.mobileNumber}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="emailAddress">Email Address</Label>
+                  <Input
+                    type="email"
+                    id="emailAddress"
+                    name="emailAddress"
+                    value={formData.emailAddress}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="panNumber">PAN Number</Label>
+                  <Input
+                    type="text"
+                    id="panNumber"
+                    name="panNumber"
+                    value={formData.panNumber}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="aadhaarNumber">Aadhaar Number</Label>
+                  <Input
+                    type="text"
+                    id="aadhaarNumber"
+                    name="aadhaarNumber"
+                    value={formData.aadhaarNumber}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="occupation">Occupation</Label>
+                  <Select onValueChange={(value) => handleSelectChange('occupation', value)}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select occupation" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Salaried">Salaried</SelectItem>
+                      <SelectItem value="Self-Employed">Self-Employed</SelectItem>
+                      <SelectItem value="Business">Business</SelectItem>
+                      <SelectItem value="Student">Student</SelectItem>
+                      <SelectItem value="Retired">Retired</SelectItem>
+                      <SelectItem value="Homemaker">Homemaker</SelectItem>
+                      <SelectItem value="Other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="annualIncome">Annual Income</Label>
+                  <Select onValueChange={(value) => handleSelectChange('annualIncome', value)}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select annual income" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Below 1 Lakh">Below 1 Lakh</SelectItem>
+                      <SelectItem value="1-5 Lakhs">1-5 Lakhs</SelectItem>
+                      <SelectItem value="5-10 Lakhs">5-10 Lakhs</SelectItem>
+                      <SelectItem value="10-25 Lakhs">10-25 Lakhs</SelectItem>
+                      <SelectItem value="25-50 Lakhs">25-50 Lakhs</SelectItem>
+                      <SelectItem value="Above 50 Lakhs">Above 50 Lakhs</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="currentAddress">Current Address</Label>
+                  <Textarea
+                    id="currentAddress"
+                    name="currentAddress"
+                    value={formData.currentAddress}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="permanentAddress">Permanent Address</Label>
+                  <Textarea
+                    id="permanentAddress"
+                    name="permanentAddress"
+                    value={formData.permanentAddress}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="nomineName">Nominee Name</Label>
+                  <Input
+                    type="text"
+                    id="nomineName"
+                    name="nomineName"
+                    value={formData.nomineName}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="nomineeRelation">Relationship with Nominee</Label>
+                  <Input
+                    type="text"
+                    id="nomineeRelation"
+                    name="nomineeRelation"
+                    value={formData.nomineeRelation}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div>
+                  <Label>Account Type</Label>
+                  <RadioGroup defaultValue="savings" className="flex flex-col space-y-1">
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="savings" id="account-type-savings"  onClick={() => handleSelectChange('accountType', 'Savings')}/>
+                      <Label htmlFor="account-type-savings">Savings</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="current" id="account-type-current" onClick={() => handleSelectChange('accountType', 'Current')}/>
+                      <Label htmlFor="account-type-current">Current</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="fixed-deposit" id="account-type-fixed-deposit" onClick={() => handleSelectChange('accountType', 'Fixed Deposit')}/>
+                      <Label htmlFor="account-type-fixed-deposit">Fixed Deposit</Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+                <div>
+                  <Label htmlFor="initialDeposit">Initial Deposit Amount</Label>
+                  <Input
+                    type="number"
+                    id="initialDeposit"
+                    name="initialDeposit"
+                    value={formData.initialDeposit}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+                <div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox id="terms" name="termsAndConditions" onCheckedChange={handleCheckboxChange} />
+                    <Label htmlFor="terms">I agree to the terms and conditions</Label>
+                  </div>
+                </div>
+                <Button type="submit">Submit</Button>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
