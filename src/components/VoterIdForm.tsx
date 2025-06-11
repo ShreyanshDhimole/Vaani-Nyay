@@ -1,7 +1,8 @@
+
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Home, Upload } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import VoiceInput from './VoiceInput';
 import VoterIdPreview from './VoterIdPreview';
@@ -36,6 +37,7 @@ interface FormData {
   };
   documentsAvailable: string[];
   otherDocument: string;
+  uploadedFiles: File[];
 }
 
 const VoterIdForm = () => {
@@ -72,7 +74,8 @@ const VoterIdForm = () => {
       stateUt: ''
     },
     documentsAvailable: [],
-    otherDocument: ''
+    otherDocument: '',
+    uploadedFiles: []
   });
 
   const formFields = [
@@ -93,10 +96,10 @@ const VoterIdForm = () => {
       type: 'radio', 
       section: 'application',
       options: [
-        'Shifting of Residence',
-        'Correction of Entries in Existing Electoral Roll',
-        'Issue of Replacement EPIC without correction',
-        'Request for marking as Person with Disability'
+        translate('appType.shifting'),
+        translate('appType.correction'),
+        translate('appType.replacement'),
+        translate('appType.disability')
       ]
     },
     { key: 'shiftingReason', label: 'Application for Shifting of Residence - Reason', type: 'textarea', section: 'application' },
@@ -114,19 +117,20 @@ const VoterIdForm = () => {
       type: 'checkbox',
       section: 'documents',
       options: [
-        'Water/Electricity/Gas connection Bill for that address (atleast 1 year)',
-        'Current passbook of Nationalised/Scheduled Bank/Post Office',
-        'Revenue Department\'s Land Owning records including Kisan Bahi',
-        'Registered Rent Lease Deed (In case of tenant)',
-        'Aadhaar Card',
-        'Indian Passport',
-        'Registered Sale Deed (In case of own house)'
+        translate('doc.utility'),
+        translate('doc.passbook'),
+        translate('doc.land'),
+        translate('doc.rent'),
+        translate('doc.aadhaar'),
+        translate('doc.passport'),
+        translate('doc.sale')
       ]
     },
-    { key: 'otherDocument', label: 'Any Other Document (Please Specify)', type: 'text', section: 'documents' }
+    { key: 'otherDocument', label: 'Any Other Document (Please Specify)', type: 'text', section: 'documents' },
+    { key: 'uploadedFiles', label: 'Upload Supporting Documents', type: 'file', section: 'documents' }
   ];
 
-  const handleInputChange = (key: string, value: string | boolean | string[]) => {
+  const handleInputChange = (key: string, value: string | boolean | string[] | File[]) => {
     if (key.includes('.')) {
       const [parent, child] = key.split('.');
       setFormData(prev => ({
@@ -151,7 +155,6 @@ const VoterIdForm = () => {
 
   const nextStep = () => {
     if (editingField) {
-      // If we're editing a field, confirm and go back to preview
       const confirmed = window.confirm(translate('confirm.saveChanges') || 'Save changes and return to preview?');
       if (confirmed) {
         setEditingField(null);
@@ -185,6 +188,13 @@ const VoterIdForm = () => {
     }
   };
 
+  const handleFileUpload = (files: FileList | null) => {
+    if (files) {
+      const fileArray = Array.from(files);
+      handleInputChange('uploadedFiles', [...formData.uploadedFiles, ...fileArray]);
+    }
+  };
+
   const currentField = formFields[currentStep];
 
   if (showPreview) {
@@ -198,7 +208,7 @@ const VoterIdForm = () => {
   }
 
   // For voice input fields, use full screen
-  if (!['radio', 'checkbox'].includes(currentField.type)) {
+  if (!['radio', 'checkbox', 'file'].includes(currentField.type)) {
     return (
       <VoiceInput
         value={getCurrentValue(currentField.key)}
@@ -214,19 +224,30 @@ const VoterIdForm = () => {
     );
   }
 
-  // For radio and checkbox fields, use the regular form layout
+  // For radio, checkbox, and file fields, use the regular form layout
   return (
     <div className="min-h-screen bg-[#141E28] p-4">
       <div className="max-w-4xl mx-auto">
         <div className="mb-6">
-          <Button 
-            variant="outline" 
-            onClick={() => navigate('/')} 
-            className="mb-4 border-[#33FEBF] text-[#33FEBF] hover:bg-[#33FEBF] hover:text-[#141E28]"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            {translate('button.back')}
-          </Button>
+          <div className="flex justify-between items-center mb-4">
+            <Button 
+              variant="outline" 
+              onClick={() => navigate('/')} 
+              className="border-[#33FEBF] text-[#33FEBF] hover:bg-[#33FEBF] hover:text-[#141E28]"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              {translate('button.back')}
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              onClick={() => navigate('/')} 
+              className="border-[#33FEBF] text-[#33FEBF] hover:bg-[#33FEBF] hover:text-[#141E28]"
+            >
+              <Home className="w-4 h-4 mr-2" />
+              {translate('button.home')}
+            </Button>
+          </div>
           
           <div className="bg-[#33FEBF] text-[#141E28] p-2 rounded mb-4">
             <p className="text-sm font-medium">
@@ -244,15 +265,16 @@ const VoterIdForm = () => {
         <Card className="shadow-lg border border-[#33FEBF] bg-white">
           <CardHeader className="bg-[#33FEBF] text-[#141E28]">
             <CardTitle className="text-xl text-center">
-              {translate('forms.voterId')} - {translate('form.subtitle') || 'Election Commission of India (Form-8)'}
+              {translate('software.name')} - {translate('forms.voterId')}
             </CardTitle>
+            <p className="text-center text-sm">{translate('form.subtitle')}</p>
           </CardHeader>
           
           <CardContent className="p-8 bg-white">
             <div className="space-y-6">
               <div className="text-center mb-8">
                 <h2 className="text-2xl font-bold text-[#141E28] mb-4">
-                  {currentField.label}
+                  {translate(`question.${currentField.key}`) || currentField.label}
                 </h2>
               </div>
 
@@ -295,6 +317,50 @@ const VoterIdForm = () => {
                       <span className="text-[#141E28] text-sm">{option}</span>
                     </label>
                   ))}
+                </div>
+              )}
+
+              {currentField.type === 'file' && (
+                <div className="space-y-4">
+                  <div className="border-2 border-dashed border-[#33FEBF] rounded-lg p-8 text-center">
+                    <Upload className="w-12 h-12 text-[#33FEBF] mx-auto mb-4" />
+                    <input
+                      type="file"
+                      multiple
+                      accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                      onChange={(e) => handleFileUpload(e.target.files)}
+                      className="hidden"
+                      id="file-upload"
+                    />
+                    <label
+                      htmlFor="file-upload"
+                      className="cursor-pointer text-[#33FEBF] hover:underline"
+                    >
+                      {translate('button.uploadFile')} (PDF, Images, Documents)
+                    </label>
+                  </div>
+                  
+                  {formData.uploadedFiles.length > 0 && (
+                    <div className="mt-4">
+                      <h4 className="font-medium text-[#141E28] mb-2">Uploaded Files:</h4>
+                      <ul className="space-y-1">
+                        {formData.uploadedFiles.map((file, index) => (
+                          <li key={index} className="text-sm text-gray-600 flex items-center justify-between">
+                            <span>{file.name}</span>
+                            <button
+                              onClick={() => {
+                                const newFiles = formData.uploadedFiles.filter((_, i) => i !== index);
+                                handleInputChange('uploadedFiles', newFiles);
+                              }}
+                              className="text-red-500 text-xs hover:underline"
+                            >
+                              Remove
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </div>
               )}
 

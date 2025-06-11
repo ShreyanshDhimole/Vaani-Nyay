@@ -44,7 +44,7 @@ interface VoterIdPreviewProps {
 }
 
 const VoterIdPreview = ({ formData, onBack, onEdit }: VoterIdPreviewProps) => {
-  const { translate } = useLanguage();
+  const { translate, selectedLanguage } = useLanguage();
 
   const handleSubmit = () => {
     toast({
@@ -53,9 +53,9 @@ const VoterIdPreview = ({ formData, onBack, onEdit }: VoterIdPreviewProps) => {
     });
   };
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     try {
-      generateVoterIdPDF(formData);
+      await generateVoterIdPDF(formData, selectedLanguage);
       toast({
         title: translate('toast.downloadStarted') || "Download Started",
         description: translate('toast.downloadDescription') || "Your form is being downloaded as PDF.",
@@ -337,6 +337,25 @@ const VoterIdPreview = ({ formData, onBack, onEdit }: VoterIdPreviewProps) => {
               </div>
             </div>
 
+            {/* Uploaded Files Section */}
+            {formData.uploadedFiles && formData.uploadedFiles.length > 0 && (
+              <div className="border border-black">
+                <div className="p-4">
+                  <div className="text-sm font-medium mb-3">
+                    {translate('preview.uploadedFiles') || 'Uploaded Files'}
+                  </div>
+                  <div className="space-y-2">
+                    {formData.uploadedFiles.map((file, index) => (
+                      <div key={index} className="text-sm text-gray-600 flex items-center justify-between bg-gray-50 p-2 rounded">
+                        <span>{file.name}</span>
+                        <span className="text-xs text-gray-500">{(file.size / 1024).toFixed(1)} KB</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Action Buttons */}
             <div className="flex justify-center space-x-4 pt-6 border-t">
               <Button 
@@ -363,3 +382,5 @@ const VoterIdPreview = ({ formData, onBack, onEdit }: VoterIdPreviewProps) => {
 };
 
 export default VoterIdPreview;
+
+</edits_to_apply>

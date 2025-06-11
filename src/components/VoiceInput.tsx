@@ -1,11 +1,9 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Mic, MicOff, ArrowLeft, ArrowRight, HelpCircle, Home } from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
+import { ArrowLeft, ArrowRight, Home, Mic, MicOff, HelpCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -27,22 +25,21 @@ interface VoiceInputProps {
   isLastField: boolean;
 }
 
-const VoiceInput = ({ 
-  value, 
-  onChange, 
-  placeholder, 
-  field, 
-  onNext, 
-  onPrevious, 
-  canGoNext, 
-  canGoPrevious, 
-  isLastField 
+const VoiceInput = ({
+  value,
+  onChange,
+  placeholder,
+  field,
+  onNext,
+  onPrevious,
+  canGoNext,
+  canGoPrevious,
+  isLastField
 }: VoiceInputProps) => {
-  const [isListening, setIsListening] = useState(false);
-  const [showHelp, setShowHelp] = useState(false);
-  const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
   const navigate = useNavigate();
   const { translate } = useLanguage();
+  const [isListening, setIsListening] = useState(false);
+  const [showExample, setShowExample] = useState(false);
 
   const getFieldQuestion = (fieldKey: string) => {
     const questions = {
@@ -98,12 +95,17 @@ const VoiceInput = ({
     return examples[fieldKey] || '';
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      if (canGoNext) {
-        onNext();
-      }
+  const getQuestionText = () => {
+    return translate(`question.${field.key}`) || field.label;
+  };
+
+  const getExampleText = () => {
+    return translate(`example.${field.key}`) || '';
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && canGoNext) {
+      onNext();
     }
   };
 
@@ -152,6 +154,14 @@ const VoiceInput = ({
     setIsListening(false);
   };
 
+  const toggleListening = () => {
+    if (isListening) {
+      stopListening();
+    } else {
+      startListening();
+    }
+  };
+
   useEffect(() => {
     if (inputRef.current) {
       inputRef.current.focus();
@@ -159,128 +169,120 @@ const VoiceInput = ({
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#141E28] flex flex-col">
-      {/* Header */}
-      <div className="bg-[#33FEBF] text-[#141E28] p-4">
-        <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate('/')}
-              className="text-[#141E28] hover:bg-[#141E28]/10"
+    <div className="min-h-screen bg-[#141E28] p-4">
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="mb-6">
+          <div className="flex justify-between items-center mb-4">
+            <div className="flex items-center space-x-4">
+              <Button 
+                variant="outline" 
+                onClick={onPrevious}
+                disabled={!canGoPrevious}
+                className="border-[#33FEBF] text-[#33FEBF] hover:bg-[#33FEBF] hover:text-[#141E28]"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                {translate('button.back')}
+              </Button>
+            </div>
+            
+            <div className="text-center">
+              <h1 className="text-[#33FEBF] text-xl font-bold">{translate('software.name')}</h1>
+              <p className="text-[#33FEBF] text-sm">{translate('forms.voterId')}</p>
+            </div>
+            
+            <Button 
+              variant="outline" 
+              onClick={() => navigate('/')} 
+              className="border-[#33FEBF] text-[#33FEBF] hover:bg-[#33FEBF] hover:text-[#141E28]"
             >
               <Home className="w-4 h-4 mr-2" />
-              {translate('button.home') || 'Home'}
+              {translate('button.home')}
             </Button>
-            <div>
-              <h1 className="text-xl font-bold">{translate('software.name') || 'Vaani Nyay'}</h1>
-              <p className="text-sm opacity-80">{translate('forms.voterId') || 'Voter ID Application Form'}</p>
-            </div>
-          </div>
-          <div className="text-right">
-            <p className="text-sm font-medium">
-              {translate('step.label') || 'Step'} {field.section.toUpperCase()} {translate('section.label') || 'SECTION'}
-            </p>
           </div>
         </div>
-      </div>
 
-      {/* Content */}
-      <div className="flex-1 flex items-center justify-center p-6">
-        <Card className="w-full max-w-2xl shadow-lg border border-[#33FEBF] bg-white">
-          <CardContent className="p-8">
-            <div className="text-center space-y-6">
-              {/* Question */}
-              <div className="mb-6">
-                <h2 className="text-2xl font-bold text-[#141E28] mb-2">
-                  {getFieldQuestion(field.key)}
-                </h2>
-              </div>
-
-              {/* Input with Help Icon */}
+        <Card className="shadow-lg border border-[#33FEBF] bg-white">
+          <CardHeader className="bg-white">
+            <CardTitle className="text-xl text-center text-[#141E28]">
+              {getQuestionText()}
+            </CardTitle>
+          </CardHeader>
+          
+          <CardContent className="p-8 bg-white">
+            <div className="space-y-6">
               <div className="relative">
                 {field.type === 'textarea' ? (
                   <Textarea
-                    ref={inputRef as React.RefObject<HTMLTextAreaElement>}
                     value={value}
                     onChange={(e) => onChange(e.target.value)}
+                    onKeyPress={handleKeyPress}
                     placeholder={placeholder}
-                    onKeyDown={handleKeyDown}
-                    className="w-full text-lg p-4 border-2 border-[#33FEBF] focus:border-[#33FEBF] focus:ring-[#33FEBF] rounded-lg pr-12"
+                    className="w-full text-lg p-4 border-2 border-[#33FEBF] focus:border-[#33FEBF] focus:ring-[#33FEBF] rounded-lg"
                     rows={4}
                   />
                 ) : (
                   <Input
-                    ref={inputRef as React.RefObject<HTMLInputElement>}
-                    type="text"
+                    type={field.type === 'email' ? 'email' : 'text'}
                     value={value}
                     onChange={(e) => onChange(e.target.value)}
+                    onKeyPress={handleKeyPress}
                     placeholder={placeholder}
-                    onKeyDown={handleKeyDown}
-                    className="w-full text-lg p-4 border-2 border-[#33FEBF] focus:border-[#33FEBF] focus:ring-[#33FEBF] rounded-lg pr-12"
+                    className="w-full text-lg p-4 border-2 border-[#33FEBF] focus:border-[#33FEBF] focus:ring-[#33FEBF] rounded-lg"
                   />
                 )}
                 
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 text-[#33FEBF] hover:bg-[#33FEBF]/10"
-                  onClick={() => setShowHelp(!showHelp)}
-                >
-                  <HelpCircle className="w-5 h-5" />
-                </Button>
+                {getExampleText() && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowExample(!showExample)}
+                    className="absolute right-2 top-2 text-[#33FEBF] hover:text-[#33FEBF]/80"
+                  >
+                    <HelpCircle className="w-4 h-4" />
+                  </Button>
+                )}
               </div>
 
-              {/* Help Text */}
-              {showHelp && (
-                <div className="bg-[#33FEBF]/10 p-3 rounded-lg text-sm text-[#141E28]">
-                  {getFieldExample(field.key)}
+              {showExample && getExampleText() && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                  <p className="text-sm text-blue-700">
+                    <strong>Example:</strong> {getExampleText()}
+                  </p>
                 </div>
               )}
 
-              {/* Voice Input Button */}
               <div className="flex justify-center">
                 <Button
-                  variant="outline"
-                  size="lg"
-                  onClick={isListening ? stopListening : startListening}
-                  className={`border-[#33FEBF] text-[#33FEBF] hover:bg-[#33FEBF] hover:text-[#141E28] ${
-                    isListening ? 'bg-[#33FEBF] text-[#141E28]' : ''
-                  }`}
+                  onClick={toggleListening}
+                  className={`${
+                    isListening 
+                      ? 'bg-red-500 hover:bg-red-600' 
+                      : 'bg-[#33FEBF] hover:bg-[#33FEBF]/90'
+                  } text-white px-6 py-3`}
                 >
-                  {isListening ? (
-                    <>
-                      <MicOff className="w-5 h-5 mr-2" />
-                      {translate('button.stopListening') || 'Stop Listening'}
-                    </>
-                  ) : (
-                    <>
-                      <Mic className="w-5 h-5 mr-2" />
-                      {translate('button.useVoice') || 'Use Voice Input'}
-                    </>
-                  )}
+                  {isListening ? <MicOff className="w-5 h-5 mr-2" /> : <Mic className="w-5 h-5 mr-2" />}
+                  {isListening ? translate('button.stopListening') : translate('button.useVoice')}
                 </Button>
               </div>
 
-              {/* Navigation Buttons */}
-              <div className="flex justify-between pt-4">
+              <div className="flex justify-between pt-6 border-t border-gray-200">
                 <Button 
                   variant="outline" 
-                  onClick={onPrevious} 
+                  onClick={onPrevious}
                   disabled={!canGoPrevious}
                   className="border-[#33FEBF] text-[#33FEBF] hover:bg-[#33FEBF] hover:text-[#141E28]"
                 >
                   <ArrowLeft className="w-4 h-4 mr-2" />
-                  {translate('button.previous') || 'Previous'}
+                  {translate('button.previous')}
                 </Button>
                 
                 <Button 
-                  onClick={onNext} 
+                  onClick={onNext}
                   disabled={!canGoNext}
                   className="bg-[#33FEBF] hover:bg-[#33FEBF]/90 text-[#141E28]"
                 >
-                  {isLastField ? (translate('button.preview') || 'Preview Form') : (translate('button.next') || 'Next')}
+                  {isLastField ? (translate('button.preview') || 'Preview') : (translate('button.next') || 'Next')}
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </div>

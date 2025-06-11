@@ -1,4 +1,6 @@
+
 import jsPDF from 'jspdf';
+import { translateFormData } from './translationService';
 
 interface FormData {
   assemblyConstituencyNo: string;
@@ -29,17 +31,23 @@ interface FormData {
   };
   documentsAvailable: string[];
   otherDocument: string;
+  uploadedFiles?: File[];
 }
 
-export const generateVoterIdPDF = (formData: FormData): void => {
+export const generateVoterIdPDF = async (formData: FormData, language: string = 'en'): Promise<void> => {
+  // Translate form data to English for PDF
+  const translatedData = await translateFormData(formData, language);
+  
   const pdf = new jsPDF('p', 'mm', 'a4');
   const pageWidth = pdf.internal.pageSize.getWidth();
+  const margin = 10;
+  const contentWidth = pageWidth - (2 * margin);
   
   // Set font
   pdf.setFont('helvetica', 'normal');
   
-  // Main border - adjusted to stay within margins
-  pdf.rect(15, 15, pageWidth - 30, 260);
+  // Main border - within margins
+  pdf.rect(margin, margin, contentWidth, 270);
   
   // Header section
   pdf.setFontSize(8);
@@ -73,106 +81,107 @@ export const generateVoterIdPDF = (formData: FormData): void => {
   // To section
   pdf.setFontSize(8);
   pdf.setFont('helvetica', 'normal');
-  pdf.text('To,', 20, yPos);
+  pdf.text('To,', margin + 5, yPos);
   yPos += 5;
-  pdf.text('The Electoral Registration Officer,', 20, yPos);
+  pdf.text('The Electoral Registration Officer,', margin + 5, yPos);
   yPos += 4;
-  pdf.text('No. & Name of Assembly Constituency', 20, yPos);
+  pdf.text('No. & Name of Assembly Constituency', margin + 5, yPos);
   yPos += 8;
   
-  // Assembly constituency - adjusted to fit within margins
-  pdf.text('No.', 20, yPos);
-  drawSmallBoxes(pdf, 30, yPos - 3, formData.assemblyConstituencyNo, 3);
-  pdf.text('Name', 50, yPos);
-  drawLongBoxes(pdf, 65, yPos - 3, formData.assemblyConstituencyName, 20); // Reduced from 25 to 20
+  // Assembly constituency - properly constrained
+  pdf.text('No.', margin + 5, yPos);
+  drawSmallBoxes(pdf, margin + 20, yPos - 3, translatedData.assemblyConstituencyNo, 3);
+  pdf.text('Name', margin + 35, yPos);
+  drawLongBoxes(pdf, margin + 50, yPos - 3, translatedData.assemblyConstituencyName, Math.floor((contentWidth - 60) / 4)); 
   yPos += 8;
   
-  pdf.text('Or No. & Name of Parliamentary Constituency@', 20, yPos);
-  pdf.text('No.', 20, yPos + 5);
-  drawSmallBoxes(pdf, 30, yPos + 2, formData.parliamentaryConstituencyNo, 3);
-  pdf.text('Name', 50, yPos + 5);
-  drawLongBoxes(pdf, 65, yPos + 2, formData.parliamentaryConstituencyName, 20); // Reduced from 25 to 20
+  pdf.text('Or No. & Name of Parliamentary Constituency@', margin + 5, yPos);
+  pdf.text('No.', margin + 5, yPos + 5);
+  drawSmallBoxes(pdf, margin + 20, yPos + 2, translatedData.parliamentaryConstituencyNo, 3);
+  pdf.text('Name', margin + 35, yPos + 5);
+  drawLongBoxes(pdf, margin + 50, yPos + 2, translatedData.parliamentaryConstituencyName, Math.floor((contentWidth - 60) / 4));
   yPos += 10;
   
   pdf.setFontSize(7);
-  pdf.text('(# only for Union Territories not having Legislative Assembly)', 20, yPos);
+  pdf.text('(# only for Union Territories not having Legislative Assembly)', margin + 5, yPos);
   yPos += 10;
   
   // Name section
   pdf.setFontSize(8);
-  pdf.text('(i) Name of the applicant', 20, yPos);
+  pdf.text('(i) Name of the applicant', margin + 5, yPos);
   yPos += 5;
-  drawLongBoxes(pdf, 20, yPos, formData.applicantName, 30); // Reduced from 35 to 30
+  drawLongBoxes(pdf, margin + 5, yPos, translatedData.applicantName, Math.floor(contentWidth / 4));
   yPos += 12;
   
   // EPIC section
-  pdf.text('EPIC No.', 20, yPos);
+  pdf.text('EPIC No.', margin + 5, yPos);
   yPos += 5;
-  drawMediumBoxes(pdf, 20, yPos, formData.epicNo, 12); // Reduced from 15 to 12
+  drawMediumBoxes(pdf, margin + 5, yPos, translatedData.epicNo, Math.floor((contentWidth - 10) / 8));
   yPos += 12;
   
   // Aadhaar section
-  pdf.text('Aadhaar Details :- (Please tick the appropriate box)', 20, yPos);
+  pdf.text('Aadhaar Details :- (Please tick the appropriate box)', margin + 5, yPos);
   yPos += 6;
   
-  pdf.text('(a)', 20, yPos);
-  drawCheckbox(pdf, 28, yPos - 2, !!formData.aadhaarNumber);
-  pdf.text('Aadhaar Number', 35, yPos);
-  if (formData.aadhaarNumber) {
-    drawMediumBoxes(pdf, 75, yPos - 2, formData.aadhaarNumber, 10); // Reduced from 12 to 10
+  pdf.text('(a)', margin + 5, yPos);
+  drawCheckbox(pdf, margin + 13, yPos - 2, !!translatedData.aadhaarNumber);
+  pdf.text('Aadhaar Number', margin + 20, yPos);
+  if (translatedData.aadhaarNumber) {
+    drawMediumBoxes(pdf, margin + 60, yPos - 2, translatedData.aadhaarNumber, Math.floor((contentWidth - 70) / 6));
   }
-  pdf.text('or', 140, yPos); // Moved left
+  pdf.text('or', contentWidth - 20, yPos);
   yPos += 6;
   
-  pdf.text('(b)', 20, yPos);
-  drawCheckbox(pdf, 28, yPos - 2, formData.noAadhaar);
-  pdf.text('I am not able to furnish my Aadhaar Number because I don\'t have Aadhaar Number.', 35, yPos);
+  pdf.text('(b)', margin + 5, yPos);
+  drawCheckbox(pdf, margin + 13, yPos - 2, translatedData.noAadhaar);
+  pdf.text('I am not able to furnish my Aadhaar Number because I don\'t have Aadhaar Number.', margin + 20, yPos);
   yPos += 10;
   
   // Mobile numbers
-  pdf.text('Mobile No. of Self (or)', 20, yPos);
+  pdf.text('Mobile No. of Self (or)', margin + 5, yPos);
   yPos += 5;
-  drawMobileBoxes(pdf, 20, yPos, formData.mobileNoSelf);
+  drawMobileBoxes(pdf, margin + 5, yPos, translatedData.mobileNoSelf);
   yPos += 8;
   
-  pdf.text('Mobile No. of Father/Mother/Any other relative (if available)', 20, yPos);
+  pdf.text('Mobile No. of Father/Mother/Any other relative (if available)', margin + 5, yPos);
   yPos += 5;
-  drawMobileBoxes(pdf, 20, yPos, formData.mobileNoRelative);
+  drawMobileBoxes(pdf, margin + 5, yPos, translatedData.mobileNoRelative);
   yPos += 10;
   
   // Email sections
-  pdf.text('Email Id of Self (or)', 20, yPos);
+  pdf.text('Email Id of Self (or)', margin + 5, yPos);
   yPos += 2;
-  pdf.line(20, yPos + 2, 170, yPos + 2); // Shortened line
-  if (formData.emailSelf) {
-    pdf.text(formData.emailSelf, 20, yPos + 1);
+  pdf.line(margin + 5, yPos + 2, contentWidth - 5, yPos + 2);
+  if (translatedData.emailSelf) {
+    pdf.text(translatedData.emailSelf, margin + 5, yPos + 1);
   }
   yPos += 8;
   
-  pdf.text('Email Id of Father/Mother/Any other relative (if available)', 20, yPos);
+  pdf.text('Email Id of Father/Mother/Any other relative (if available)', margin + 5, yPos);
   yPos += 2;
-  pdf.line(20, yPos + 2, 170, yPos + 2); // Shortened line
-  if (formData.emailRelative) {
-    pdf.text(formData.emailRelative, 20, yPos + 1);
+  pdf.line(margin + 5, yPos + 2, contentWidth - 5, yPos + 2);
+  if (translatedData.emailRelative) {
+    pdf.text(translatedData.emailRelative, margin + 5, yPos + 1);
   }
   yPos += 12;
   
   // Application type
-  pdf.text('(ii) I submit application for    (Tick any one of the following)', 20, yPos);
+  pdf.text('(ii) I submit application for    (Tick any one of the following)', margin + 5, yPos);
   yPos += 6;
   
   const appTypes = [
-    'Shifting of Residence (or)',
-    'Correction of Entries in Existing Electoral Roll (or)',
-    'Issue of Replacement EPIC without correction (or)',
+    'Shifting of Residence',
+    'Correction of Entries in Existing Electoral Roll',
+    'Issue of Replacement EPIC without correction',
     'Request for marking as Person with Disability'
   ];
   
   appTypes.forEach((type, index) => {
-    const isChecked = formData.applicationType === type.replace(' (or)', '');
-    pdf.text(`${index + 1}.`, 20, yPos);
-    drawCheckbox(pdf, 28, yPos - 2, isChecked);
-    pdf.text(type, 35, yPos);
+    const isChecked = translatedData.applicationType === type || 
+                      translatedData.applicationType.includes(type.split(' ')[0]);
+    pdf.text(`${index + 1}.`, margin + 5, yPos);
+    drawCheckbox(pdf, margin + 13, yPos - 2, isChecked);
+    pdf.text(`${type} ${index < 3 ? '(or)' : ''}`, margin + 20, yPos);
     yPos += 5;
   });
   
@@ -182,56 +191,58 @@ export const generateVoterIdPDF = (formData: FormData): void => {
   if (yPos > 220) {
     pdf.addPage();
     yPos = 20;
-    pdf.rect(15, 15, pageWidth - 30, 260);
+    pdf.rect(margin, margin, contentWidth, 270);
   }
   
   // Address section
-  pdf.text('Present Address', 20, yPos);
+  pdf.text('Present Address', margin + 5, yPos);
   yPos += 8;
   
-  // Left column addresses - adjusted positions and lengths
+  // Left column addresses - properly constrained
   pdf.setFontSize(7);
-  pdf.text('House/Building/Apartment No.', 20, yPos);
-  drawAddressBoxes(pdf, 20, yPos + 3, formData.presentAddress.houseNo, 12);
+  const midPoint = contentWidth / 2;
   
-  pdf.text('Street/Area/Locality/ Mohalla/Road', 105, yPos);
-  drawAddressBoxes(pdf, 105, yPos + 3, formData.presentAddress.streetArea, 15);
+  pdf.text('House/Building/Apartment No.', margin + 5, yPos);
+  drawAddressBoxes(pdf, margin + 5, yPos + 3, translatedData.presentAddress.houseNo, Math.floor((midPoint - 10) / 4));
+  
+  pdf.text('Street/Area/Locality/ Mohalla/Road', margin + midPoint, yPos);
+  drawAddressBoxes(pdf, margin + midPoint, yPos + 3, translatedData.presentAddress.streetArea, Math.floor((midPoint - 5) / 4));
   yPos += 12;
   
-  pdf.text('Town/Village', 20, yPos);
-  drawAddressBoxes(pdf, 20, yPos + 3, formData.presentAddress.townVillage, 12);
+  pdf.text('Town/Village', margin + 5, yPos);
+  drawAddressBoxes(pdf, margin + 5, yPos + 3, translatedData.presentAddress.townVillage, Math.floor((midPoint - 10) / 4));
   
-  pdf.text('Post Office', 105, yPos);
-  drawAddressBoxes(pdf, 105, yPos + 3, formData.presentAddress.postOffice, 12);
+  pdf.text('Post Office', margin + midPoint, yPos);
+  drawAddressBoxes(pdf, margin + midPoint, yPos + 3, translatedData.presentAddress.postOffice, Math.floor((midPoint - 5) / 4));
   yPos += 12;
   
-  pdf.text('PIN Code', 20, yPos);
-  drawAddressBoxes(pdf, 20, yPos + 3, formData.presentAddress.pinCode, 6);
+  pdf.text('PIN Code', margin + 5, yPos);
+  drawAddressBoxes(pdf, margin + 5, yPos + 3, translatedData.presentAddress.pinCode, 6);
   
-  pdf.text('Tehsil/Taluka/Mandal', 105, yPos);
-  drawAddressBoxes(pdf, 105, yPos + 3, formData.presentAddress.tehsilTaluka, 12);
+  pdf.text('Tehsil/Taluka/Mandal', margin + midPoint, yPos);
+  drawAddressBoxes(pdf, margin + midPoint, yPos + 3, translatedData.presentAddress.tehsilTaluka, Math.floor((midPoint - 5) / 4));
   yPos += 12;
   
-  pdf.text('District', 20, yPos);
-  drawAddressBoxes(pdf, 20, yPos + 3, formData.presentAddress.district, 12);
+  pdf.text('District', margin + 5, yPos);
+  drawAddressBoxes(pdf, margin + 5, yPos + 3, translatedData.presentAddress.district, Math.floor((midPoint - 10) / 4));
   
-  pdf.text('State/UT', 105, yPos);
-  drawAddressBoxes(pdf, 105, yPos + 3, formData.presentAddress.stateUt, 12);
+  pdf.text('State/UT', margin + midPoint, yPos);
+  drawAddressBoxes(pdf, margin + midPoint, yPos + 3, translatedData.presentAddress.stateUt, Math.floor((midPoint - 5) / 4));
   yPos += 15;
   
   // Check if we need a new page for documents
   if (yPos > 200) {
     pdf.addPage();
     yPos = 20;
-    pdf.rect(15, 15, pageWidth - 30, 260);
+    pdf.rect(margin, margin, contentWidth, 270);
   }
   
   // Documents section
   pdf.setFontSize(8);
   const docText = 'Self-attested copy of address proof either in the name of applicant or anyone of the parents/spouse/adult child,';
   const docText2 = 'if already enrolled with as elector at the same address (Attach any one of the documents mentioned below *):-';
-  pdf.text(docText, 20, yPos);
-  pdf.text(docText2, 20, yPos + 4);
+  pdf.text(docText, margin + 5, yPos);
+  pdf.text(docText2, margin + 5, yPos + 4);
   yPos += 12;
   
   const documents = [
@@ -244,18 +255,19 @@ export const generateVoterIdPDF = (formData: FormData): void => {
     'Registered Sale Deed (In case of own house)'
   ];
   
-  // Two column layout for documents - adjusted to fit within margins
+  // Two column layout for documents - properly constrained
   documents.forEach((doc, index) => {
     const col = index % 2;
     const row = Math.floor(index / 2);
-    const x = col === 0 ? 20 : 100; // Adjusted column positions
+    const x = col === 0 ? margin + 5 : margin + midPoint;
     const y = yPos + (row * 6);
     
     pdf.text(`${index + 1}.`, x, y);
-    drawCheckbox(pdf, x + 8, y - 2, formData.documentsAvailable?.includes(doc) || false);
+    drawCheckbox(pdf, x + 8, y - 2, translatedData.documentsAvailable?.includes(doc) || false);
     
-    // Wrap text for better fit - reduced text width
-    const wrappedText = pdf.splitTextToSize(doc, 70);
+    // Wrap text for better fit
+    const maxWidth = midPoint - 20;
+    const wrappedText = pdf.splitTextToSize(doc, maxWidth);
     pdf.text(wrappedText[0], x + 15, y);
     if (wrappedText.length > 1) {
       pdf.text(wrappedText[1], x + 15, y + 3);
@@ -264,18 +276,30 @@ export const generateVoterIdPDF = (formData: FormData): void => {
   
   yPos += 25;
   
-  if (formData.otherDocument) {
-    pdf.text('Any Other:- (Pl. Specify)', 20, yPos);
+  if (translatedData.otherDocument) {
+    pdf.text('Any Other:- (Pl. Specify)', margin + 5, yPos);
     yPos += 3;
-    pdf.line(20, yPos + 2, 170, yPos + 2); // Shortened line
-    pdf.text(formData.otherDocument, 20, yPos + 1);
+    pdf.line(margin + 5, yPos + 2, contentWidth - 5, yPos + 2);
+    pdf.text(translatedData.otherDocument, margin + 5, yPos + 1);
+    yPos += 8;
+  }
+  
+  // Add uploaded files information if any
+  if (formData.uploadedFiles && formData.uploadedFiles.length > 0) {
+    yPos += 5;
+    pdf.text('Attached Documents:', margin + 5, yPos);
+    yPos += 5;
+    formData.uploadedFiles.forEach((file, index) => {
+      pdf.text(`${index + 1}. ${file.name}`, margin + 10, yPos);
+      yPos += 4;
+    });
   }
   
   // Save the PDF
   pdf.save('voter-id-application.pdf');
 };
 
-// Helper functions for different box types - all adjusted for better fit
+// Helper functions for different box types - all properly constrained
 const drawSmallBoxes = (pdf: jsPDF, x: number, y: number, text: string, count: number) => {
   const boxSize = 4;
   for (let i = 0; i < count; i++) {
@@ -339,9 +363,11 @@ const drawAddressBoxes = (pdf: jsPDF, x: number, y: number, text: string, count:
 const drawCheckbox = (pdf: jsPDF, x: number, y: number, checked: boolean) => {
   pdf.rect(x, y, 3, 3);
   if (checked) {
-    pdf.setFontSize(10);
+    // Draw a more visible tick mark
+    pdf.setFontSize(12);
     pdf.setFont('helvetica', 'bold');
-    pdf.text('✓', x + 0.3, y + 2.3);
+    pdf.text('✓', x + 0.2, y + 2.5);
     pdf.setFont('helvetica', 'normal');
+    pdf.setFontSize(8);
   }
 };

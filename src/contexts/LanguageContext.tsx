@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 interface LanguageContextType {
@@ -42,7 +43,7 @@ const translations: Record<string, Record<string, string>> = {
     'language.select': 'Select Language',
     'language.hindi': 'हिन्दी',
     'language.bengali': 'বাংলা',
-    'language.tamil': 'தமிழ்',
+    'language.tamil': 'தমিழ்',
     'language.telugu': 'తెలుగు',
     'language.marathi': 'मराठी',
     'language.gujarati': 'ગુજરાતી',
@@ -56,6 +57,7 @@ const translations: Record<string, Record<string, string>> = {
     'button.home': 'Home',
     'button.useVoice': 'Use Voice Input',
     'button.stopListening': 'Stop Listening',
+    'button.uploadFile': 'Upload File',
     'software.name': 'Vaani Nyay',
     'form.subtitle': 'Election Commission of India (Form-8)',
     'step.label': 'Step',
@@ -86,6 +88,9 @@ const translations: Record<string, Record<string, string>> = {
     'question.district': 'What is your district name?',
     'question.stateUt': 'What is your state/UT name?',
     'question.otherDocument': 'Please specify any other document you want to attach',
+    'question.applicationType': 'Please select your application type',
+    'question.documentsAvailable': 'Please select the documents you have available',
+    'question.uploadDocument': 'Upload supporting documents',
     
     // Examples
     'example.assemblyConstituencyNo': 'e.g., 123',
@@ -109,6 +114,21 @@ const translations: Record<string, Record<string, string>> = {
     'example.district': 'e.g., New Delhi',
     'example.stateUt': 'e.g., Delhi, Maharashtra',
     'example.otherDocument': 'e.g., Birth Certificate, Passport',
+    
+    // Application types
+    'appType.shifting': 'Shifting of Residence',
+    'appType.correction': 'Correction of Entries in Existing Electoral Roll',
+    'appType.replacement': 'Issue of Replacement EPIC without correction',
+    'appType.disability': 'Request for marking as Person with Disability',
+    
+    // Document types
+    'doc.utility': 'Water/Electricity/Gas connection Bill for that address (atleast 1 year)',
+    'doc.passbook': 'Current passbook of Nationalised/Scheduled Bank/Post Office',
+    'doc.land': 'Revenue Department\'s Land Owning records including Kisan Bahi',
+    'doc.rent': 'Registered Rent Lease Deed (In case of tenant)',
+    'doc.aadhaar': 'Aadhaar Card',
+    'doc.passport': 'Indian Passport',
+    'doc.sale': 'Registered Sale Deed (In case of own house)',
     
     // Preview form labels
     'preview.to': 'To,',
@@ -155,6 +175,7 @@ const translations: Record<string, Record<string, string>> = {
     'button.home': 'होम',
     'button.useVoice': 'आवाज़ इनपुट का उपयोग करें',
     'button.stopListening': 'सुनना बंद करें',
+    'button.uploadFile': 'फ़ाइल अपलोड करें',
     'software.name': 'वाणी न्याय',
     'form.subtitle': 'भारत निर्वाचन आयोग (फॉर्म-8)',
     'step.label': 'चरण',
@@ -185,6 +206,9 @@ const translations: Record<string, Record<string, string>> = {
     'question.district': 'आपके जिले का नाम क्या है?',
     'question.stateUt': 'आपके राज्य/केंद्र शासित प्रदेश का नाम क्या है?',
     'question.otherDocument': 'कृपया कोई अन्य दस्तावेज़ निर्दिष्ट करें जिसे आप संलग्न करना चाहते हैं',
+    'question.applicationType': 'कृपया अपना आवेदन प्रकार चुनें',
+    'question.documentsAvailable': 'कृपया उपलब्ध दस्तावेज़ चुनें',
+    'question.uploadDocument': 'सहायक दस्तावेज़ अपलोड करें',
     
     // Examples in Hindi
     'example.assemblyConstituencyNo': 'उदा., 123',
@@ -207,7 +231,22 @@ const translations: Record<string, Record<string, string>> = {
     'example.tehsilTaluka': 'उदा., केंद्रीय दिल्ली',
     'example.district': 'उदा., नई दिल्ली',
     'example.stateUt': 'उदा., दिल्ली, महाराष्ट्र',
-    'example.otherDocument': 'उदा., जन्म प्रमाण पत्र, पासपोर्ट'
+    'example.otherDocument': 'उदा., जन्म प्रमाण पत्र, पासपोर्ट',
+    
+    // Application types in Hindi
+    'appType.shifting': 'निवास स्थान परिवर्तन',
+    'appType.correction': 'मौजूदा मतदाता सूची में सुधार',
+    'appType.replacement': 'बिना सुधार के प्रतिस्थापन EPIC जारी करना',
+    'appType.disability': 'विकलांग व्यक्ति के रूप में चिह्नित करने का अनुरोध',
+    
+    // Document types in Hindi
+    'doc.utility': 'उस पते के लिए पानी/बिजली/गैस कनेक्शन बिल (कम से कम 1 साल)',
+    'doc.passbook': 'राष्ट्रीयकृत/अनुसूचित बैंक/पोस्ट ऑफिस की वर्तमान पासबुक',
+    'doc.land': 'किसान बही सहित राजस्व विभाग के भूमि स्वामित्व रिकॉर्ड',
+    'doc.rent': 'पंजीकृत किराया पट्टा विलेख (किरायेदार के मामले में)',
+    'doc.aadhaar': 'आधार कार्ड',
+    'doc.passport': 'भारतीय पासपोर्ट',
+    'doc.sale': 'पंजीकृत बिक्री विलेख (अपने घर के मामले में)'
   },
   bn: {
     'forms.title': 'সরকারি ফর্ম',
@@ -225,13 +264,40 @@ const translations: Record<string, Record<string, string>> = {
     'button.home': 'হোম',
     'button.useVoice': 'ভয়েস ইনপুট ব্যবহার করুন',
     'button.stopListening': 'শোনা বন্ধ করুন',
+    'button.uploadFile': 'ফাইল আপলোড করুন',
     'software.name': 'বাণী ন্যায়',
     'form.subtitle': 'ভারতের নির্বাচন কমিশন (ফর্ম-৮)',
     'step.label': 'ধাপ',
     'section.label': 'বিভাগ',
     'of.label': 'এর',
     'enter.label': 'প্রবেশ করুন',
-    'confirm.saveChanges': 'পরিবর্তন সংরক্ষণ করুন এবং প্রিভিউতে ফিরে যান?'
+    'confirm.saveChanges': 'পরিবর্তন সংরক্ষণ করুন এবং প্রিভিউতে ফিরে যান?',
+    
+    // Questions in Bengali  
+    'question.assemblyConstituencyNo': 'আপনার বিধানসভা নির্বাচনী এলাকার নম্বর কী?',
+    'question.assemblyConstituencyName': 'আপনার বিধানসভা নির্বাচনী এলাকার নাম কী?',
+    'question.parliamentaryConstituencyNo': 'আপনার সংসদীয় নির্বাচনী এলাকার নম্বর কী?',
+    'question.parliamentaryConstituencyName': 'আপনার সংসদীয় নির্বাচনী এলাকার নাম কী?',
+    'question.applicantName': 'আপনার পূর্ণ নাম কী?',
+    'question.epicNo': 'আপনার EPIC (ভোটার আইডি) নম্বর কী?',
+    'question.aadhaarNumber': 'আপনার আধার নম্বর কী?',
+    'question.mobileNoSelf': 'আপনার মোবাইল নম্বর কী?',
+    'question.mobileNoRelative': 'আপনার আত্মীয়ের মোবাইল নম্বর কী?',
+    'question.emailSelf': 'আপনার ইমেইল ঠিকানা কী?',
+    'question.emailRelative': 'আপনার আত্মীয়ের ইমেইল ঠিকানা কী?',
+    'question.shiftingReason': 'বাসস্থান পরিবর্তনের কারণ কী?',
+    'question.houseNo': 'আপনার বাড়ি/ভবন/অ্যাপার্টমেন্ট নম্বর কী?',
+    'question.streetArea': 'আপনার রাস্তা/এলাকা/পাড়া/রোডের নাম কী?',
+    'question.townVillage': 'আপনার শহর/গ্রামের নাম কী?',
+    'question.postOffice': 'আপনার ডাকঘরের নাম কী?',
+    'question.pinCode': 'আপনার পিন কোড কী?',
+    'question.tehsilTaluka': 'আপনার তহসিল/তালুকা/মন্ডলের নাম কী?',
+    'question.district': 'আপনার জেলার নাম কী?',
+    'question.stateUt': 'আপনার রাজ্য/কেন্দ্রশাসিত অঞ্চলের নাম কী?',
+    'question.otherDocument': 'আপনি যে অন্য কোনো নথি সংযুক্ত করতে চান তা উল্লেখ করুন',
+    'question.applicationType': 'আপনার আবেদনের ধরন নির্বাচন করুন',
+    'question.documentsAvailable': 'আপনার কাছে উপলব্ধ নথিগুলি নির্বাচন করুন',
+    'question.uploadDocument': 'সহায়ক নথি আপলোড করুন'
   }
 };
 
