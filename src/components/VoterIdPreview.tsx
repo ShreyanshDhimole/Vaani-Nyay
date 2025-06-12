@@ -1,4 +1,3 @@
-
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Download, Send } from 'lucide-react';
@@ -37,6 +36,26 @@ interface FormData {
   documentsAvailable: string[];
   otherDocument: string;
   uploadedFiles?: File[];
+  
+  enableCorrectionSection?: boolean;
+  enableReplacementSection?: boolean;
+  enableDisabilitySection?: boolean;
+  
+  correctionFields?: {
+    name: boolean;
+    gender: boolean;
+    dobAge: boolean;
+    relationType: boolean;
+    relationName: boolean;
+    address: boolean;
+    mobileNumber: boolean;
+    photo: boolean;
+  };
+  correctParticulars?: string;
+  documentName?: string;
+  
+  declarationDate?: string;
+  declarationPlace?: string;
 }
 
 interface VoterIdPreviewProps {
@@ -90,7 +109,7 @@ const VoterIdPreview = ({ formData, onBack, onEdit }: VoterIdPreviewProps) => {
             <div className="text-center space-y-2">
               <div className="flex items-center justify-between">
                 <div className="w-16 h-16 border border-black bg-white flex items-center justify-center">
-                  <img src="/lovable-uploads/d3aeee09-31ae-4fd2-b005-ed8ee73cb35a.png" alt="ECI Logo" className="w-12 h-12" />
+                  <img src="/lovable-uploads/482dfa6a-6a70-440d-94e0-ce7e8009abda.png" alt="ECI Logo" className="w-12 h-12" />
                 </div>
                 <div className="flex-1 text-center">
                   <p className="text-sm font-medium">{translate('preview.dateNotification') || 'Date of Notification:'}</p>
@@ -336,6 +355,67 @@ const VoterIdPreview = ({ formData, onBack, onEdit }: VoterIdPreviewProps) => {
                     </div>
                   </div>
                 )}
+              </div>
+            </div>
+
+            {/* Additional sections preview */}
+            {formData.enableCorrectionSection && (
+              <div className="border border-black">
+                <div className="p-4">
+                  <div className="text-sm font-medium mb-3">2. Application for Correction of Entries</div>
+                  <div className="text-xs text-gray-600 mb-2">
+                    Correction fields selected and particulars filled in the form
+                  </div>
+                  {formData.correctParticulars && (
+                    <div className="mt-2">
+                      <span className="text-sm font-medium">Correct Particulars: </span>
+                      <span className="text-sm">{formData.correctParticulars}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {formData.enableReplacementSection && (
+              <div className="border border-black">
+                <div className="p-4">
+                  <div className="text-sm font-medium mb-3">3. Application for Issue of Replacement EPIC</div>
+                  <div className="text-xs text-gray-600">
+                    Replacement EPIC section enabled and filled in the form
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {formData.enableDisabilitySection && (
+              <div className="border border-black">
+                <div className="p-4">
+                  <div className="text-sm font-medium mb-3">4. Application for Marking Person with Disability</div>
+                  <div className="text-xs text-gray-600">
+                    Disability marking section enabled and filled in the form
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Declaration Section */}
+            <div className="border border-black">
+              <div className="p-4">
+                <div className="text-sm font-medium mb-3 text-center">DECLARATION</div>
+                <div className="text-xs mb-3">
+                  I HEREBY DECLARE that to the best of my knowledge and belief that I am a citizen of India...
+                </div>
+                <div className="flex justify-between items-center">
+                  <div>
+                    <span className="text-sm">Date: </span>
+                    <span className="text-sm">{formData.declarationDate || '_______'}</span>
+                  </div>
+                  <div>
+                    <span className="text-sm">Place: </span>
+                    <span className="text-sm">{formData.declarationPlace || '_______'}</span>
+                  </div>
+                  <div className="text-sm">Signature of Applicant</div>
+                </div>
               </div>
             </div>
 

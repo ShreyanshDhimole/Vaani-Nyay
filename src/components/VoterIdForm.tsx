@@ -37,6 +37,12 @@ interface FormData {
   documentsAvailable: string[];
   otherDocument: string;
   uploadedFiles: File[];
+  
+  // Additional sections
+  enableCorrectionSection: boolean;
+  enableReplacementSection: boolean;
+  enableDisabilitySection: boolean;
+  
   correctionFields: {
     name: boolean;
     gender: boolean;
@@ -49,7 +55,7 @@ interface FormData {
   };
   correctParticulars: string;
   documentName: string;
-  documentDetails: string;
+  
   replacementReason: string;
   oldEpicStatus: string;
   epicCondition: {
@@ -58,6 +64,7 @@ interface FormData {
     mutilated: boolean;
   };
   mutilatedDetails: string;
+  
   disabilityCategory: string;
   disabilityType: {
     locomotive: boolean;
@@ -68,7 +75,12 @@ interface FormData {
   otherDisability: string;
   disabilityPercentage: string;
   certificateAttached: boolean;
-  photographRequired: boolean;
+  
+  // Declaration
+  declarationDate: string;
+  declarationPlace: string;
+  acknowledgeNumber: string;
+  acknowledgeDate: string;
 }
 
 const VoterIdForm = () => {
@@ -107,6 +119,11 @@ const VoterIdForm = () => {
     documentsAvailable: [],
     otherDocument: '',
     uploadedFiles: [],
+    
+    enableCorrectionSection: false,
+    enableReplacementSection: false,
+    enableDisabilitySection: false,
+    
     correctionFields: {
       name: false,
       gender: false,
@@ -119,7 +136,7 @@ const VoterIdForm = () => {
     },
     correctParticulars: '',
     documentName: '',
-    documentDetails: '',
+    
     replacementReason: '',
     oldEpicStatus: '',
     epicCondition: {
@@ -128,6 +145,7 @@ const VoterIdForm = () => {
       mutilated: false,
     },
     mutilatedDetails: '',
+    
     disabilityCategory: '',
     disabilityType: {
       locomotive: false,
@@ -138,10 +156,15 @@ const VoterIdForm = () => {
     otherDisability: '',
     disabilityPercentage: '',
     certificateAttached: false,
-    photographRequired: true,
+    
+    declarationDate: '',
+    declarationPlace: '',
+    acknowledgeNumber: '',
+    acknowledgeDate: '',
   });
 
-  const formFields = [
+  // Base form fields
+  const baseFormFields = [
     { key: 'assemblyConstituencyNo', label: 'Assembly Constituency Number', type: 'text', section: 'constituency' },
     { key: 'assemblyConstituencyName', label: 'Assembly Constituency Name', type: 'text', section: 'constituency' },
     { key: 'parliamentaryConstituencyNo', label: 'Parliamentary Constituency Number', type: 'text', section: 'constituency' },
@@ -159,74 +182,13 @@ const VoterIdForm = () => {
       type: 'radio', 
       section: 'application',
       options: [
-        translate('appType.shifting'),
-        translate('appType.correction'),
-        translate('appType.replacement'),
-        translate('appType.disability')
+        'Shifting of Residence',
+        'Correction of Entries in Existing Electoral Roll',
+        'Issue of Replacement EPIC without correction',
+        'Request for marking as Person with Disability'
       ]
     },
     { key: 'shiftingReason', label: 'Application for Shifting of Residence - Reason', type: 'textarea', section: 'application' },
-    
-    // Correction of entries fields
-    {
-      key: 'correctionFields',
-      label: 'Please correct my following details in Electoral Roll/EPIC (Maximum of 4 entries/particulars can be corrected)',
-      type: 'checkbox',
-      section: 'correction',
-      options: [
-        'Name',
-        'Gender',
-        'DoB/Age',
-        'Relation Type',
-        'Relation Name',
-        'Address',
-        'Mobile Number',
-        'Photo'
-      ]
-    },
-    { key: 'correctParticulars', label: 'The correct particulars in the entry to be corrected are as under', type: 'textarea', section: 'correction' },
-    { key: 'documentName', label: 'Name of Document in support of above claim attached', type: 'text', section: 'correction' },
-    { key: 'documentDetails', label: 'Document Details', type: 'textarea', section: 'correction' },
-    
-    // Replacement EPIC fields
-    { key: 'replacementReason', label: 'I request that a replacement EPIC may be issued to me due to change in my personal details', type: 'textarea', section: 'replacement' },
-    { key: 'oldEpicStatus', label: 'I hereby return my old EPIC', type: 'text', section: 'replacement' },
-    {
-      key: 'epicCondition',
-      label: 'Condition of old EPIC',
-      type: 'checkbox',
-      section: 'replacement',
-      options: [
-        'Lost',
-        'Destroyed due to reason beyond control like floods, fire, other natural disaster etc.',
-        'Mutilated'
-      ]
-    },
-    { key: 'mutilatedDetails', label: 'If mutilated, provide details', type: 'textarea', section: 'replacement' },
-    
-    // Disability marking fields
-    { key: 'disabilityCategory', label: 'Category of disability (Tick the appropriate box for category of disability)', type: 'text', section: 'disability' },
-    {
-      key: 'disabilityType',
-      label: 'Type of disability',
-      type: 'checkbox',
-      section: 'disability',
-      options: [
-        'Locomotive',
-        'Visual',
-        'Deaf & Dumb',
-        'If any other (Give description)'
-      ]
-    },
-    { key: 'otherDisability', label: 'Other disability description', type: 'text', section: 'disability' },
-    { key: 'disabilityPercentage', label: 'Percentage of disability %', type: 'text', section: 'disability' },
-    {
-      key: 'certificateAttached',
-      label: 'Certificate attached (Tick the appropriate box)',
-      type: 'radio',
-      section: 'disability',
-      options: ['Yes', 'No']
-    },
     
     // Address fields
     { key: 'presentAddress.houseNo', label: 'House/Building/Apartment Number', type: 'text', section: 'address' },
@@ -238,25 +200,87 @@ const VoterIdForm = () => {
     { key: 'presentAddress.district', label: 'District', type: 'text', section: 'address' },
     { key: 'presentAddress.stateUt', label: 'State/UT', type: 'text', section: 'address' },
     
-    // Documents and uploads
+    // Documents
     {
       key: 'documentsAvailable',
       label: 'Self-attested copy of address proof (Tick relevant documents)',
       type: 'checkbox',
       section: 'documents',
       options: [
-        translate('doc.utility'),
-        translate('doc.passbook'),
-        translate('doc.land'),
-        translate('doc.rent'),
-        translate('doc.aadhaar'),
-        translate('doc.passport'),
-        translate('doc.sale')
+        'Water/Electricity/Gas connection Bill for that address (atleast 1 year)',
+        'Current passbook of Nationalised/Scheduled Bank/Post Office',
+        'Revenue Department\'s Land Owning records including Kisan Bahi',
+        'Registered Rent Lease Deed (In case of tenant)',
+        'Aadhaar Card',
+        'Indian Passport',
+        'Registered Sale Deed (In case of own house)'
       ]
     },
     { key: 'otherDocument', label: 'Any Other Document (Please Specify)', type: 'text', section: 'documents' },
-    { key: 'uploadedFiles', label: 'Upload Supporting Documents', type: 'file', section: 'documents' }
+    { key: 'uploadedFiles', label: 'Upload Supporting Documents', type: 'file', section: 'documents' },
+    
+    // Additional sections enablement
+    { key: 'enableCorrectionSection', label: 'Do you want to fill the Correction of Entries section?', type: 'radio', section: 'additional', options: ['Yes', 'No'] },
+    { key: 'enableReplacementSection', label: 'Do you want to fill the Replacement EPIC section?', type: 'radio', section: 'additional', options: ['Yes', 'No'] },
+    { key: 'enableDisabilitySection', label: 'Do you want to fill the Disability Marking section?', type: 'radio', section: 'additional', options: ['Yes', 'No'] },
   ];
+
+  // Conditional fields based on enabled sections
+  const conditionalFields = [
+    // Correction fields (only if enabled)
+    ...(formData.enableCorrectionSection ? [
+      {
+        key: 'correctionFields',
+        label: 'Please correct my following details in Electoral Roll/EPIC (Maximum of 4 entries/particulars can be corrected)',
+        type: 'checkbox',
+        section: 'correction',
+        options: ['Name', 'Gender', 'DoB/Age', 'Relation Type', 'Relation Name', 'Address', 'Mobile Number', 'Photo']
+      },
+      { key: 'correctParticulars', label: 'The correct particulars in the entry to be corrected are as under', type: 'textarea', section: 'correction' },
+      { key: 'documentName', label: 'Name of Document in support of above claim attached', type: 'text', section: 'correction' },
+    ] : []),
+    
+    // Replacement fields (only if enabled)
+    ...(formData.enableReplacementSection ? [
+      { key: 'replacementReason', label: 'I request that a replacement EPIC may be issued to me due to change in my personal details', type: 'textarea', section: 'replacement' },
+      { key: 'oldEpicStatus', label: 'I hereby return my old EPIC', type: 'text', section: 'replacement' },
+      {
+        key: 'epicCondition',
+        label: 'Condition of old EPIC',
+        type: 'checkbox',
+        section: 'replacement',
+        options: ['Lost', 'Destroyed due to reason beyond control like floods, fire, other natural disaster etc.', 'Mutilated']
+      },
+      { key: 'mutilatedDetails', label: 'If mutilated, provide details', type: 'textarea', section: 'replacement' },
+    ] : []),
+    
+    // Disability fields (only if enabled)
+    ...(formData.enableDisabilitySection ? [
+      { key: 'disabilityCategory', label: 'Category of disability (Tick the appropriate box for category of disability)', type: 'text', section: 'disability' },
+      {
+        key: 'disabilityType',
+        label: 'Type of disability',
+        type: 'checkbox',
+        section: 'disability',
+        options: ['Locomotive', 'Visual', 'Deaf & Dumb', 'If any other (Give description)']
+      },
+      { key: 'otherDisability', label: 'Other disability description', type: 'text', section: 'disability' },
+      { key: 'disabilityPercentage', label: 'Percentage of disability %', type: 'text', section: 'disability' },
+      {
+        key: 'certificateAttached',
+        label: 'Certificate attached (Tick the appropriate box)',
+        type: 'radio',
+        section: 'disability',
+        options: ['Yes', 'No']
+      },
+    ] : []),
+    
+    // Declaration fields
+    { key: 'declarationDate', label: 'Declaration Date', type: 'text', section: 'declaration' },
+    { key: 'declarationPlace', label: 'Declaration Place', type: 'text', section: 'declaration' },
+  ];
+
+  const formFields = [...baseFormFields, ...conditionalFields];
 
   const handleInputChange = (key: string, value: string | boolean | string[] | File[]) => {
     if (key.includes('.')) {
@@ -279,6 +303,13 @@ const VoterIdForm = () => {
         }));
       }
     } else {
+      // Handle boolean conversion for enable fields
+      if (key.startsWith('enable') && typeof value === 'string') {
+        value = value === 'Yes';
+      }
+      if (key === 'certificateAttached' && typeof value === 'string') {
+        value = value === 'Yes';
+      }
       setFormData(prev => ({ ...prev, [key]: value }));
     }
   };
@@ -351,7 +382,7 @@ const VoterIdForm = () => {
       <VoiceInput
         value={getCurrentValue(currentField.key)}
         onChange={(value) => handleInputChange(currentField.key, value)}
-        placeholder={`${translate('enter.label') || 'Enter'} ${currentField.label.toLowerCase()}`}
+        placeholder={`Enter ${currentField.label.toLowerCase()}`}
         field={currentField}
         onNext={nextStep}
         onPrevious={prevStep}
@@ -412,7 +443,7 @@ const VoterIdForm = () => {
             <div className="space-y-6">
               <div className="text-center mb-8">
                 <h2 className="text-2xl font-bold text-[#141E28] mb-4">
-                  {translate(`question.${currentField.key}`) || currentField.label}
+                  {currentField.label}
                 </h2>
               </div>
 
@@ -441,13 +472,34 @@ const VoterIdForm = () => {
                       <input
                         type="checkbox"
                         value={option}
-                        checked={(formData.documentsAvailable || []).includes(option)}
+                        checked={
+                          currentField.key === 'documentsAvailable' 
+                            ? (formData.documentsAvailable || []).includes(option)
+                            : currentField.key === 'correctionFields'
+                            ? (formData.correctionFields as any)[option.toLowerCase().replace(/[^a-z]/g, '')]
+                            : currentField.key === 'epicCondition'
+                            ? (formData.epicCondition as any)[option.toLowerCase().split(' ')[0]]
+                            : currentField.key === 'disabilityType'
+                            ? (formData.disabilityType as any)[option.toLowerCase().replace(/[^a-z]/g, '')]
+                            : false
+                        }
                         onChange={(e) => {
-                          const currentDocs = formData.documentsAvailable || [];
-                          if (e.target.checked) {
-                            handleInputChange('documentsAvailable', [...currentDocs, option]);
-                          } else {
-                            handleInputChange('documentsAvailable', currentDocs.filter(doc => doc !== option));
+                          if (currentField.key === 'documentsAvailable') {
+                            const currentDocs = formData.documentsAvailable || [];
+                            if (e.target.checked) {
+                              handleInputChange('documentsAvailable', [...currentDocs, option]);
+                            } else {
+                              handleInputChange('documentsAvailable', currentDocs.filter(doc => doc !== option));
+                            }
+                          } else if (currentField.key === 'correctionFields') {
+                            const fieldKey = option.toLowerCase().replace(/[^a-z]/g, '');
+                            handleInputChange(`correctionFields.${fieldKey}`, e.target.checked);
+                          } else if (currentField.key === 'epicCondition') {
+                            const conditionKey = option.toLowerCase().split(' ')[0];
+                            handleInputChange(`epicCondition.${conditionKey}`, e.target.checked);
+                          } else if (currentField.key === 'disabilityType') {
+                            const typeKey = option.toLowerCase().replace(/[^a-z]/g, '');
+                            handleInputChange(`disabilityType.${typeKey}`, e.target.checked);
                           }
                         }}
                         className="w-4 h-4 text-[#33FEBF] mt-1"
