@@ -1,4 +1,3 @@
-
 import jsPDF from 'jspdf';
 import { translateFormData } from './translationService';
 
@@ -32,6 +31,31 @@ interface FormData {
   documentsAvailable: string[];
   otherDocument: string;
   uploadedFiles?: File[];
+  correctionFields?: {
+    name: boolean;
+    gender: boolean;
+    dobAge: boolean;
+    relationType: boolean;
+    relationName: boolean;
+    address: boolean;
+    mobileNumber: boolean;
+    photo: boolean;
+  };
+  correctParticulars?: string;
+  documentName?: string;
+  epicCondition?: {
+    lost: boolean;
+    destroyed: boolean;
+    mutilated: boolean;
+  };
+  disabilityType?: {
+    locomotive: boolean;
+    visual: boolean;
+    deafDumb: boolean;
+    other: boolean;
+  };
+  disabilityPercentage?: string;
+  certificateAttached?: boolean;
 }
 
 export const generateVoterIdPDF = async (formData: FormData, language: string = 'en'): Promise<void> => {
@@ -295,6 +319,147 @@ export const generateVoterIdPDF = async (formData: FormData, language: string = 
     });
   }
   
+  // Check if we need a new page for correction section
+  if (yPos > 200) {
+    pdf.addPage();
+    yPos = 20;
+    pdf.rect(margin, margin, contentWidth, 270);
+  }
+
+  // Correction of Entries Section
+  pdf.setFontSize(8);
+  pdf.setFont('helvetica', 'bold');
+  pdf.text('2. Application for Correction of Entries in Existing Electoral Roll', margin + 5, yPos);
+  yPos += 6;
+  
+  pdf.setFont('helvetica', 'normal');
+  pdf.text('Please correct my following details in Electoral Roll/EPIC:', margin + 5, yPos);
+  yPos += 4;
+  pdf.text('(Maximum of 4 entries/particulars can be corrected)', margin + 5, yPos);
+  yPos += 4;
+  pdf.text('(Put a tick ☑ in appropriate box below.)', margin + 5, yPos);
+  yPos += 4;
+  pdf.text('Copy of self-attested Documentary Proof in support of claim to be attached.', margin + 5, yPos);
+  yPos += 8;
+
+  // Correction fields grid
+  const correctionFields = [
+    { key: 'name', label: 'Name', num: '1.' },
+    { key: 'gender', label: 'Gender', num: '2.' },
+    { key: 'dobAge', label: 'DoB/Age', num: '3.' },
+    { key: 'relationType', label: 'Relation Type', num: '4.' },
+    { key: 'relationName', label: 'Relation Name', num: '5.' },
+    { key: 'address', label: 'Address', num: '6.' },
+    { key: 'mobileNumber', label: 'Mobile Number', num: '7.' },
+    { key: 'photo', label: 'Photo', num: '8.' }
+  ];
+
+  // Draw correction fields in 2 columns
+  correctionFields.forEach((field, index) => {
+    const col = index % 2;
+    const row = Math.floor(index / 2);
+    const x = col === 0 ? margin + 5 : margin + (contentWidth / 2);
+    const y = yPos + (row * 6);
+    
+    pdf.text(field.num, x, y);
+    drawCheckbox(pdf, x + 10, y - 2, formData.correctionFields?.[field.key as keyof typeof formData.correctionFields] || false);
+    pdf.text(field.label, x + 18, y);
+  });
+  yPos += 30;
+
+  // Photo requirement box
+  pdf.rect(contentWidth - 60, yPos - 25, 55, 20);
+  pdf.setFontSize(6);
+  pdf.text('AFFIX FOR PASTING ONE', contentWidth - 58, yPos - 20);
+  pdf.text('RECENT PASSPORT SIZE', contentWidth - 58, yPos - 17);
+  pdf.text('UNSIGNED COLOR', contentWidth - 58, yPos - 14);
+  pdf.text('PHOTOGRAPH (4.5 CM X', contentWidth - 58, yPos - 11);
+  pdf.text('3.5 CM) SHOWING', contentWidth - 58, yPos - 8);
+  pdf.text('FRONTAL VIEW OF FULL', contentWidth - 58, yPos - 5);
+  pdf.text('FACE WITH WHITE', contentWidth - 58, yPos - 2);
+  pdf.text('BACKGROUND ONLY IF', contentWidth - 58, yPos + 1);
+  pdf.text('PHOTO IS TO BE CHANGED)', contentWidth - 58, yPos + 4);
+
+  pdf.setFontSize(8);
+  pdf.text('The correct particulars in the entry to be corrected are as under:-', margin + 5, yPos);
+  yPos += 6;
+
+  // Correction particulars box
+  pdf.rect(margin + 5, yPos, contentWidth - 10, 15);
+  if (formData.correctParticulars) {
+    pdf.text(formData.correctParticulars, margin + 7, yPos + 4);
+  }
+  yPos += 20;
+
+  pdf.text('Name of Document in support of above claim attached', margin + 5, yPos);
+  yPos += 6;
+  pdf.rect(margin + 5, yPos, contentWidth - 10, 8);
+  if (formData.documentName) {
+    pdf.text(formData.documentName, margin + 7, yPos + 4);
+  }
+  yPos += 15;
+
+  // Replacement EPIC Section
+  pdf.setFont('helvetica', 'bold');
+  pdf.text('3. Application for Issue of Replacement EPIC without correction', margin + 5, yPos);
+  yPos += 6;
+  
+  pdf.setFont('helvetica', 'normal');
+  pdf.text('I request that a replacement EPIC may be issued to me due to change in my personal details.', margin + 5, yPos);
+  yPos += 4;
+  pdf.text('I hereby return my old EPIC', margin + 5, yPos);
+  yPos += 8;
+
+  // EPIC condition checkboxes
+  const epicConditions = [
+    { key: 'lost', label: 'Lost' },
+    { key: 'destroyed', label: 'Destroyed due to reason beyond control like floods, fire, other natural disaster etc.' },
+    { key: 'mutilated', label: 'Mutilated' }
+  ];
+
+  epicConditions.forEach((condition, index) => {
+    drawCheckbox(pdf, margin + 5, yPos - 2, formData.epicCondition?.[condition.key as keyof typeof formData.epicCondition] || false);
+    pdf.text(condition.label, margin + 13, yPos);
+    yPos += 5;
+  });
+  yPos += 5;
+
+  // Disability Section
+  pdf.setFont('helvetica', 'bold');
+  pdf.text('4. Application for Marking Person with Disability', margin + 5, yPos);
+  yPos += 6;
+  
+  pdf.setFont('helvetica', 'normal');
+  pdf.text('Category of disability (Tick the appropriate box for category of disability)', margin + 5, yPos);
+  yPos += 8;
+
+  const disabilityTypes = [
+    { key: 'locomotive', label: 'Locomotive' },
+    { key: 'visual', label: 'Visual' },
+    { key: 'deafDumb', label: 'Deaf & Dumb' },
+    { key: 'other', label: 'If any other (Give description)' }
+  ];
+
+  disabilityTypes.forEach((type, index) => {
+    const col = index % 2;
+    const row = Math.floor(index / 2);
+    const x = col === 0 ? margin + 5 : margin + (contentWidth / 2);
+    const y = yPos + (row * 6);
+    
+    drawCheckbox(pdf, x, y - 2, formData.disabilityType?.[type.key as keyof typeof formData.disabilityType] || false);
+    pdf.text(type.label, x + 10, y);
+  });
+  yPos += 15;
+
+  pdf.text('Percentage of disability', margin + 5, yPos);
+  drawSmallBoxes(pdf, margin + 60, yPos - 3, formData.disabilityPercentage || '', 3);
+  pdf.text('%, Certificate attached (Tick the appropriate box)', margin + 75, yPos);
+  drawCheckbox(pdf, margin + 160, yPos - 2, formData.certificateAttached);
+  pdf.text('Yes', margin + 168, yPos);
+  drawCheckbox(pdf, margin + 185, yPos - 2, !formData.certificateAttached);
+  pdf.text('No', margin + 193, yPos);
+  yPos += 10;
+
   // Save the PDF
   pdf.save('voter-id-application.pdf');
 };
@@ -360,14 +525,14 @@ const drawAddressBoxes = (pdf: jsPDF, x: number, y: number, text: string, count:
   }
 };
 
+// Update the drawCheckbox function to make ticks more visible
 const drawCheckbox = (pdf: jsPDF, x: number, y: number, checked: boolean) => {
   pdf.rect(x, y, 3, 3);
   if (checked) {
-    // Draw a more visible tick mark
-    pdf.setFontSize(12);
-    pdf.setFont('helvetica', 'bold');
-    pdf.text('✓', x + 0.2, y + 2.5);
-    pdf.setFont('helvetica', 'normal');
-    pdf.setFontSize(8);
+    // Draw a bold, more visible tick mark
+    pdf.setLineWidth(0.5);
+    pdf.line(x + 0.5, y + 1.5, x + 1.2, y + 2.2);
+    pdf.line(x + 1.2, y + 2.2, x + 2.5, y + 0.8);
+    pdf.setLineWidth(0.2); // Reset line width
   }
 };

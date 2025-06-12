@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -38,6 +37,38 @@ interface FormData {
   documentsAvailable: string[];
   otherDocument: string;
   uploadedFiles: File[];
+  correctionFields: {
+    name: boolean;
+    gender: boolean;
+    dobAge: boolean;
+    relationType: boolean;
+    relationName: boolean;
+    address: boolean;
+    mobileNumber: boolean;
+    photo: boolean;
+  };
+  correctParticulars: string;
+  documentName: string;
+  documentDetails: string;
+  replacementReason: string;
+  oldEpicStatus: string;
+  epicCondition: {
+    lost: boolean;
+    destroyed: boolean;
+    mutilated: boolean;
+  };
+  mutilatedDetails: string;
+  disabilityCategory: string;
+  disabilityType: {
+    locomotive: boolean;
+    visual: boolean;
+    deafDumb: boolean;
+    other: boolean;
+  };
+  otherDisability: string;
+  disabilityPercentage: string;
+  certificateAttached: boolean;
+  photographRequired: boolean;
 }
 
 const VoterIdForm = () => {
@@ -75,7 +106,39 @@ const VoterIdForm = () => {
     },
     documentsAvailable: [],
     otherDocument: '',
-    uploadedFiles: []
+    uploadedFiles: [],
+    correctionFields: {
+      name: false,
+      gender: false,
+      dobAge: false,
+      relationType: false,
+      relationName: false,
+      address: false,
+      mobileNumber: false,
+      photo: false,
+    },
+    correctParticulars: '',
+    documentName: '',
+    documentDetails: '',
+    replacementReason: '',
+    oldEpicStatus: '',
+    epicCondition: {
+      lost: false,
+      destroyed: false,
+      mutilated: false,
+    },
+    mutilatedDetails: '',
+    disabilityCategory: '',
+    disabilityType: {
+      locomotive: false,
+      visual: false,
+      deafDumb: false,
+      other: false,
+    },
+    otherDisability: '',
+    disabilityPercentage: '',
+    certificateAttached: false,
+    photographRequired: true,
   });
 
   const formFields = [
@@ -103,6 +166,69 @@ const VoterIdForm = () => {
       ]
     },
     { key: 'shiftingReason', label: 'Application for Shifting of Residence - Reason', type: 'textarea', section: 'application' },
+    
+    // Correction of entries fields
+    {
+      key: 'correctionFields',
+      label: 'Please correct my following details in Electoral Roll/EPIC (Maximum of 4 entries/particulars can be corrected)',
+      type: 'checkbox',
+      section: 'correction',
+      options: [
+        'Name',
+        'Gender',
+        'DoB/Age',
+        'Relation Type',
+        'Relation Name',
+        'Address',
+        'Mobile Number',
+        'Photo'
+      ]
+    },
+    { key: 'correctParticulars', label: 'The correct particulars in the entry to be corrected are as under', type: 'textarea', section: 'correction' },
+    { key: 'documentName', label: 'Name of Document in support of above claim attached', type: 'text', section: 'correction' },
+    { key: 'documentDetails', label: 'Document Details', type: 'textarea', section: 'correction' },
+    
+    // Replacement EPIC fields
+    { key: 'replacementReason', label: 'I request that a replacement EPIC may be issued to me due to change in my personal details', type: 'textarea', section: 'replacement' },
+    { key: 'oldEpicStatus', label: 'I hereby return my old EPIC', type: 'text', section: 'replacement' },
+    {
+      key: 'epicCondition',
+      label: 'Condition of old EPIC',
+      type: 'checkbox',
+      section: 'replacement',
+      options: [
+        'Lost',
+        'Destroyed due to reason beyond control like floods, fire, other natural disaster etc.',
+        'Mutilated'
+      ]
+    },
+    { key: 'mutilatedDetails', label: 'If mutilated, provide details', type: 'textarea', section: 'replacement' },
+    
+    // Disability marking fields
+    { key: 'disabilityCategory', label: 'Category of disability (Tick the appropriate box for category of disability)', type: 'text', section: 'disability' },
+    {
+      key: 'disabilityType',
+      label: 'Type of disability',
+      type: 'checkbox',
+      section: 'disability',
+      options: [
+        'Locomotive',
+        'Visual',
+        'Deaf & Dumb',
+        'If any other (Give description)'
+      ]
+    },
+    { key: 'otherDisability', label: 'Other disability description', type: 'text', section: 'disability' },
+    { key: 'disabilityPercentage', label: 'Percentage of disability %', type: 'text', section: 'disability' },
+    {
+      key: 'certificateAttached',
+      label: 'Certificate attached (Tick the appropriate box)',
+      type: 'radio',
+      section: 'disability',
+      options: ['Yes', 'No']
+    },
+    
+    // Address fields
     { key: 'presentAddress.houseNo', label: 'House/Building/Apartment Number', type: 'text', section: 'address' },
     { key: 'presentAddress.streetArea', label: 'Street/Area/Locality/Mohalla/Road', type: 'text', section: 'address' },
     { key: 'presentAddress.townVillage', label: 'Town/Village', type: 'text', section: 'address' },
@@ -111,6 +237,8 @@ const VoterIdForm = () => {
     { key: 'presentAddress.tehsilTaluka', label: 'Tehsil/Taluka/Mandal', type: 'text', section: 'address' },
     { key: 'presentAddress.district', label: 'District', type: 'text', section: 'address' },
     { key: 'presentAddress.stateUt', label: 'State/UT', type: 'text', section: 'address' },
+    
+    // Documents and uploads
     {
       key: 'documentsAvailable',
       label: 'Self-attested copy of address proof (Tick relevant documents)',
@@ -133,13 +261,23 @@ const VoterIdForm = () => {
   const handleInputChange = (key: string, value: string | boolean | string[] | File[]) => {
     if (key.includes('.')) {
       const [parent, child] = key.split('.');
-      setFormData(prev => ({
-        ...prev,
-        [parent]: {
-          ...prev[parent as keyof FormData] as any,
-          [child]: value
-        }
-      }));
+      if (parent === 'correctionFields' || parent === 'epicCondition' || parent === 'disabilityType') {
+        setFormData(prev => ({
+          ...prev,
+          [parent]: {
+            ...prev[parent as keyof FormData] as any,
+            [child]: value
+          }
+        }));
+      } else {
+        setFormData(prev => ({
+          ...prev,
+          [parent]: {
+            ...prev[parent as keyof FormData] as any,
+            [child]: value
+          }
+        }));
+      }
     } else {
       setFormData(prev => ({ ...prev, [key]: value }));
     }
