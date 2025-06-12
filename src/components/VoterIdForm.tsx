@@ -163,7 +163,7 @@ const VoterIdForm = () => {
     acknowledgeDate: '',
   });
 
-  // Base form fields
+  // Base form fields with proper labels
   const baseFormFields = [
     { key: 'assemblyConstituencyNo', label: 'Assembly Constituency Number', type: 'text', section: 'constituency' },
     { key: 'assemblyConstituencyName', label: 'Assembly Constituency Name', type: 'text', section: 'constituency' },
@@ -190,7 +190,7 @@ const VoterIdForm = () => {
     },
     { key: 'shiftingReason', label: 'Application for Shifting of Residence - Reason', type: 'textarea', section: 'application' },
     
-    // Address fields
+    // Address fields with proper labels
     { key: 'presentAddress.houseNo', label: 'House/Building/Apartment Number', type: 'text', section: 'address' },
     { key: 'presentAddress.streetArea', label: 'Street/Area/Locality/Mohalla/Road', type: 'text', section: 'address' },
     { key: 'presentAddress.townVillage', label: 'Town/Village', type: 'text', section: 'address' },

@@ -91,26 +91,29 @@ export const generateVoterIdPDF = async (formData: FormData, language: string = 
   pdf.rect(margin, margin, contentWidth, pageHeight - 20);
   
   // Header section
-  pdf.setFontSize(9);
-  pdf.text('Date of Notification:', pageWidth - 60, 18);
+  pdf.setFontSize(8);
+  pdf.text('Date of Notification:', pageWidth - 55, 18);
   
-  // ECI Logo (using the updated logo)
+  // ECI Logo box
   const logoX = margin + 5;
   const logoY = 15;
-  pdf.rect(logoX, logoY, 20, 15);
+  pdf.rect(logoX, logoY, 20, 20);
   
-  // Add the logo image
+  // Add Indian flag colors for ECI logo
   try {
-    // This will be replaced with the actual logo from the uploaded image
-    pdf.setFillColor(255, 165, 0); // Orange color for ECI logo background
-    pdf.rect(logoX + 2, logoY + 2, 6, 4, 'F');
+    pdf.setFillColor(255, 165, 0); // Orange
+    pdf.rect(logoX + 2, logoY + 2, 16, 5, 'F');
     pdf.setFillColor(255, 255, 255); // White
-    pdf.rect(logoX + 2, logoY + 6, 6, 3, 'F');
+    pdf.rect(logoX + 2, logoY + 7, 16, 5, 'F');
     pdf.setFillColor(0, 128, 0); // Green
-    pdf.rect(logoX + 2, logoY + 9, 6, 4, 'F');
+    pdf.rect(logoX + 2, logoY + 12, 16, 5, 'F');
+    
+    // Add Ashoka Chakra in center
+    pdf.setFillColor(0, 0, 255); // Blue
+    pdf.circle(logoX + 10, logoY + 9.5, 2, 'F');
     pdf.setFillColor(0, 0, 0); // Reset to black
   } catch (error) {
-    console.log('Logo loading failed, using placeholder');
+    console.log('Logo rendering failed, using placeholder');
   }
   
   // Title section
@@ -130,7 +133,7 @@ export const generateVoterIdPDF = async (formData: FormData, language: string = 
   // Subtitle
   pdf.setFont('helvetica', 'normal');
   pdf.setFontSize(9);
-  const subtitle = 'Voter Application Form for shifting of Residence/Correction of Entries in Existing Electoral';
+  const subtitle = 'Voter Application Form for Shifting of Residence/Correction of Entries in Existing Electoral';
   const subtitle2 = 'Roll/Replacement of EPIC/Marking of PwD';
   pdf.text(subtitle, pageWidth / 2, 40, { align: 'center' });
   pdf.text(subtitle2, pageWidth / 2, 46, { align: 'center' });
@@ -215,17 +218,19 @@ export const generateVoterIdPDF = async (formData: FormData, language: string = 
   // Email sections
   pdf.text('Email Id of Self (or)', margin + 5, yPos);
   yPos += 2;
-  pdf.line(margin + 5, yPos + 2, contentWidth - 5, yPos + 2);
+  pdf.line(margin + 5, yPos + 2, contentWidth - 60, yPos + 2);
   if (translatedData.emailSelf) {
-    pdf.text(translatedData.emailSelf, margin + 5, yPos + 1);
+    const emailText = pdf.splitTextToSize(translatedData.emailSelf, contentWidth - 70);
+    pdf.text(emailText[0], margin + 5, yPos + 1);
   }
   yPos += 8;
   
   pdf.text('Email Id of Father/Mother/Any other relative (if available)', margin + 5, yPos);
   yPos += 2;
-  pdf.line(margin + 5, yPos + 2, contentWidth - 5, yPos + 2);
+  pdf.line(margin + 5, yPos + 2, contentWidth - 60, yPos + 2);
   if (translatedData.emailRelative) {
-    pdf.text(translatedData.emailRelative, margin + 5, yPos + 1);
+    const emailText = pdf.splitTextToSize(translatedData.emailRelative, contentWidth - 70);
+    pdf.text(emailText[0], margin + 5, yPos + 1);
   }
   yPos += 12;
   
@@ -258,9 +263,12 @@ export const generateVoterIdPDF = async (formData: FormData, language: string = 
     pdf.rect(margin, margin, contentWidth, pageHeight - 20);
   }
   
-  // Shifting of Residence section
+  // Section 1: Shifting of Residence
+  pdf.setFont('helvetica', 'bold');
   pdf.text('1. Application for Shifting of Residence', margin + 5, yPos);
   yPos += 5;
+  
+  pdf.setFont('helvetica', 'normal');
   pdf.text('My name shall not be deleted from the previous address and shifted to the current', margin + 5, yPos);
   yPos += 4;
   pdf.text('address mentioned below. I request that my replacement EPIC may be issued to me to reflect', margin + 5, yPos);
@@ -268,7 +276,7 @@ export const generateVoterIdPDF = async (formData: FormData, language: string = 
   pdf.text('my old EPIC.', margin + 5, yPos);
   yPos += 8;
   
-  // Address section with proper layout matching the image
+  // Address section with proper layout
   pdf.text('Present', margin + 5, yPos);
   pdf.text('House/Building/Apartment No.', margin + 25, yPos);
   drawAddressBoxes(pdf, margin + 25, yPos + 3, translatedData.presentAddress.houseNo, 15);
@@ -342,7 +350,8 @@ export const generateVoterIdPDF = async (formData: FormData, language: string = 
     pdf.text('Any Other:- (Pl. Specify)', margin + 5, yPos);
     yPos += 3;
     pdf.line(margin + 50, yPos + 2, contentWidth - 5, yPos + 2);
-    pdf.text(translatedData.otherDocument, margin + 52, yPos + 1);
+    const otherDoc = pdf.splitTextToSize(translatedData.otherDocument, contentWidth - 60);
+    pdf.text(otherDoc[0], margin + 52, yPos + 1);
     yPos += 8;
   }
   
@@ -353,7 +362,7 @@ export const generateVoterIdPDF = async (formData: FormData, language: string = 
     pdf.rect(margin, margin, contentWidth, pageHeight - 20);
   }
 
-  // Section 2: Correction of Entries (always show structure, populate if enabled)
+  // Section 2: Correction of Entries
   pdf.setFont('helvetica', 'bold');
   pdf.text('2. Application for Correction of Entries in Existing Electoral Roll', margin + 5, yPos);
   yPos += 6;
@@ -368,7 +377,21 @@ export const generateVoterIdPDF = async (formData: FormData, language: string = 
   pdf.text('Copy of self-attested Documentary Proof in support of claim to be attached.', margin + 5, yPos);
   yPos += 8;
 
-  // Correction fields grid (2x4 layout as in image)
+  // Photo space on the right side
+  pdf.rect(contentWidth - 50, yPos - 25, 45, 20);
+  pdf.setFontSize(6);
+  pdf.text('SPACE FOR PASTING ONE', contentWidth - 48, yPos - 20);
+  pdf.text('RECENT PASSPORT SIZE', contentWidth - 48, yPos - 17);
+  pdf.text('UNSIGNED COLOR', contentWidth - 48, yPos - 14);
+  pdf.text('PHOTOGRAPH (4.5 CM X', contentWidth - 48, yPos - 11);
+  pdf.text('3.5 CM) SHOWING', contentWidth - 48, yPos - 8);
+  pdf.text('FRONTAL VIEW OF FULL', contentWidth - 48, yPos - 5);
+  pdf.text('FACE WITH WHITE', contentWidth - 48, yPos - 2);
+  pdf.text('BACKGROUND ONLY IF', contentWidth - 48, yPos + 1);
+  pdf.text('PHOTO IS TO BE CHANGED)', contentWidth - 48, yPos + 4);
+  pdf.setFontSize(8);
+
+  // Correction fields grid (2x4 layout)
   const correctionFields = [
     { key: 'name', label: 'Name', num: '1.' },
     { key: 'gender', label: 'Gender', num: '2.' },
@@ -380,11 +403,11 @@ export const generateVoterIdPDF = async (formData: FormData, language: string = 
     { key: 'photo', label: 'Photo', num: '8.' }
   ];
 
-  // Draw correction fields in 2 columns as shown in image
+  // Draw correction fields in 2 columns
   correctionFields.forEach((field, index) => {
     const col = index % 2;
     const row = Math.floor(index / 2);
-    const x = col === 0 ? margin + 5 : margin + (contentWidth / 2);
+    const x = col === 0 ? margin + 5 : margin + (contentWidth / 2) - 60;
     const y = yPos + (row * 6);
     
     pdf.text(field.num, x, y);
@@ -395,27 +418,18 @@ export const generateVoterIdPDF = async (formData: FormData, language: string = 
   });
   yPos += 30;
 
-  // Photo space (as shown in image)
-  pdf.rect(contentWidth - 60, yPos - 25, 55, 20);
-  pdf.setFontSize(6);
-  pdf.text('SPACE FOR PASTING ONE', contentWidth - 58, yPos - 20);
-  pdf.text('RECENT PASSPORT SIZE', contentWidth - 58, yPos - 17);
-  pdf.text('UNSIGNED COLOR', contentWidth - 58, yPos - 14);
-  pdf.text('PHOTOGRAPH (4.5 CM X', contentWidth - 58, yPos - 11);
-  pdf.text('3.5 CM) SHOWING', contentWidth - 58, yPos - 8);
-  pdf.text('FRONTAL VIEW OF FULL', contentWidth - 58, yPos - 5);
-  pdf.text('FACE WITH WHITE', contentWidth - 58, yPos - 2);
-  pdf.text('BACKGROUND ONLY IF', contentWidth - 58, yPos + 1);
-  pdf.text('PHOTO IS TO BE CHANGED)', contentWidth - 58, yPos + 4);
-
-  pdf.setFontSize(8);
   pdf.text('The correct particulars in the entry to be corrected are as under:-', margin + 5, yPos);
   yPos += 6;
 
   // Correction particulars box
-  pdf.rect(margin + 5, yPos, contentWidth - 10, 15);
+  pdf.rect(margin + 5, yPos, contentWidth - 60, 15);
   if (formData.enableCorrectionSection && formData.correctParticulars) {
-    pdf.text(formData.correctParticulars, margin + 7, yPos + 4);
+    const correctedText = pdf.splitTextToSize(formData.correctParticulars, contentWidth - 70);
+    correctedText.forEach((line: string, index: number) => {
+      if (index < 3) { // Limit to 3 lines
+        pdf.text(line, margin + 7, yPos + 4 + (index * 4));
+      }
+    });
   }
   yPos += 20;
 
@@ -423,7 +437,8 @@ export const generateVoterIdPDF = async (formData: FormData, language: string = 
   yPos += 6;
   pdf.rect(margin + 5, yPos, contentWidth - 10, 8);
   if (formData.enableCorrectionSection && formData.documentName) {
-    pdf.text(formData.documentName, margin + 7, yPos + 4);
+    const docNameText = pdf.splitTextToSize(formData.documentName, contentWidth - 20);
+    pdf.text(docNameText[0], margin + 7, yPos + 4);
   }
   yPos += 15;
 
@@ -438,7 +453,7 @@ export const generateVoterIdPDF = async (formData: FormData, language: string = 
   pdf.text('(Put a tick in appropriate box.)', margin + 5, yPos);
   yPos += 8;
 
-  // EPIC condition checkboxes (horizontal layout as in image)
+  // EPIC condition checkboxes
   const epicConditions = [
     { key: 'lost', label: 'Lost' },
     { key: 'destroyed', label: 'Destroyed due to reason beyond control like floods, fire, other natural disaster etc.' },
@@ -449,13 +464,25 @@ export const generateVoterIdPDF = async (formData: FormData, language: string = 
     const isChecked = formData.enableReplacementSection && 
                      formData.epicCondition?.[condition.key as keyof typeof formData.epicCondition];
     drawCheckbox(pdf, margin + 5, yPos - 2, isChecked || false);
-    pdf.text(condition.label, margin + 13, yPos);
+    const conditionText = pdf.splitTextToSize(condition.label, contentWidth - 20);
+    pdf.text(conditionText[0], margin + 13, yPos);
+    if (conditionText.length > 1) {
+      pdf.text(conditionText[1], margin + 13, yPos + 3);
+      yPos += 3;
+    }
     yPos += 5;
   });
   
   pdf.text('I hereby return my mutilated/ old EPIC (OR) I have attached copy of FIR/Police report for lost EPIC & I undertake to return', margin + 5, yPos);
   pdf.text('the earlier EPIC issued to me if the same is recovered at a later stage.', margin + 5, yPos + 4);
   yPos += 15;
+
+  // Check if we need a new page
+  if (yPos > 200) {
+    pdf.addPage();
+    yPos = 20;
+    pdf.rect(margin, margin, contentWidth, pageHeight - 20);
+  }
 
   // Section 4: Disability
   pdf.setFont('helvetica', 'bold');
@@ -499,25 +526,30 @@ export const generateVoterIdPDF = async (formData: FormData, language: string = 
   pdf.text('No', margin + 193, yPos);
   yPos += 15;
 
-  // Declaration section (matching the second image)
+  // Complete Declaration section
   pdf.setFont('helvetica', 'bold');
   pdf.text('DECLARATION', pageWidth / 2, yPos, { align: 'center' });
   yPos += 8;
   
   pdf.setFont('helvetica', 'normal');
   pdf.setFontSize(7);
-  const declarationText = 'I HEREBY DECLARE that to the best of my knowledge and belief that I am a citizen of India and that I am not a ' +
-                         'statement or declaration which is false and which I know or believe to be false or do not believe to be true, is punishable ' +
-                         'under Section 31 of Representation of the People Act,1950 (43 of 1950) with imprisonment for a term which may extend to ' +
-                         'one year or with fine or with both.';
   
-  const wrappedDeclaration = pdf.splitTextToSize(declarationText, contentWidth - 10);
-  wrappedDeclaration.forEach((line: string, index: number) => {
-    pdf.text(line, margin + 5, yPos + (index * 4));
+  // Full declaration text from the image
+  const declarationText = [
+    'I HEREBY DECLARE that to the best of my knowledge and belief that I am a citizen of India and that I am not',
+    'disqualified from registration in the electoral roll for the time being in force under the Representation of the People',
+    'Act,1950 (43 of 1950) for the above mentioned part of the constituency. I am ordinarily resident at the above mentioned',
+    'address. The information given above is true. I am aware that making any statement or declaration which is false and',
+    'which I know or believe to be false or do not believe to be true, is punishable under Section 31 of Representation of',
+    'the People Act,1950 (43 of 1950) with imprisonment for a term which may extend to one year or with fine or with both.'
+  ];
+  
+  declarationText.forEach((line, index) => {
+    pdf.text(line, margin + 5, yPos + (index * 3));
   });
-  yPos += wrappedDeclaration.length * 4 + 10;
+  yPos += declarationText.length * 3 + 10;
   
-  // Date and place
+  // Date, place and signature
   pdf.setFontSize(8);
   pdf.text('Date:', margin + 5, yPos);
   pdf.line(margin + 20, yPos + 2, margin + 60, yPos + 2);
@@ -543,29 +575,30 @@ export const generateVoterIdPDF = async (formData: FormData, language: string = 
   yPos += 15;
   
   pdf.text('* Submission of self-attested copy of mentioned documents will ensure speedy delivery of services.', margin + 5, yPos);
-  yPos += 5;
+  yPos += 8;
   
   // Office use section
-  pdf.rect(margin + 5, yPos, contentWidth - 10, 25);
+  pdf.setFontSize(8);
+  pdf.rect(margin + 5, yPos, contentWidth - 10, 35);
   pdf.text('For office use:-', margin + 10, yPos + 5);
   pdf.text('Acknowledgment/Receipt for application', margin + 10, yPos + 10);
-  pdf.line(contentWidth - 20, yPos + 10, contentWidth - 5, yPos + 10);
+  pdf.line(contentWidth - 30, yPos + 12, contentWidth - 5, yPos + 12);
   
-  pdf.text('Acknowledgment Number', margin + 10, yPos + 15);
-  pdf.line(margin + 60, yPos + 17, margin + 120, yPos + 17);
-  pdf.text('Date', margin + 130, yPos + 15);
-  pdf.line(margin + 145, yPos + 17, contentWidth - 10, yPos + 17);
+  pdf.text('Acknowledgment Number', margin + 10, yPos + 17);
+  pdf.line(margin + 60, yPos + 19, margin + 120, yPos + 19);
+  pdf.text('Date', margin + 130, yPos + 17);
+  pdf.line(margin + 145, yPos + 19, contentWidth - 10, yPos + 19);
   
-  pdf.text('Received the application in Form 8 of Shri/Smt./Ms.', margin + 10, yPos + 20);
-  pdf.line(margin + 90, yPos + 22, contentWidth - 10, yPos + 22);
+  pdf.text('Received the application in Form 8 of Shri/Smt./Ms.', margin + 10, yPos + 24);
+  pdf.line(margin + 90, yPos + 26, contentWidth - 10, yPos + 26);
   
-  pdf.text('Name/Signature of ERO/AERO/BLO', pageWidth / 2, yPos + 30, { align: 'center' });
+  pdf.text('Name/Signature of ERO/AERO/BLO', pageWidth / 2, yPos + 32, { align: 'center' });
 
   // Save the PDF
   pdf.save('voter-id-application.pdf');
 };
 
-// Helper functions for different box types - all properly constrained
+// Helper functions for different box types
 const drawSmallBoxes = (pdf: jsPDF, x: number, y: number, text: string, count: number) => {
   const boxSize = 4;
   for (let i = 0; i < count; i++) {
@@ -573,7 +606,7 @@ const drawSmallBoxes = (pdf: jsPDF, x: number, y: number, text: string, count: n
     pdf.rect(boxX, y, boxSize, boxSize);
     if (i < text.length) {
       pdf.setFontSize(8);
-      pdf.text(text[i].toUpperCase(), boxX + 1, y + 3);
+      pdf.text(text[i].toUpperCase(), boxX + 1.5, y + 2.5);
     }
   }
 };
@@ -585,7 +618,7 @@ const drawMediumBoxes = (pdf: jsPDF, x: number, y: number, text: string, count: 
     pdf.rect(boxX, y, boxSize, boxSize);
     if (i < text.length) {
       pdf.setFontSize(8);
-      pdf.text(text[i].toUpperCase(), boxX + 1, y + 3);
+      pdf.text(text[i].toUpperCase(), boxX + 1.5, y + 2.5);
     }
   }
 };
@@ -597,7 +630,7 @@ const drawLongBoxes = (pdf: jsPDF, x: number, y: number, text: string, count: nu
     pdf.rect(boxX, y, boxSize, boxSize);
     if (i < text.length) {
       pdf.setFontSize(7);
-      pdf.text(text[i].toUpperCase(), boxX + 0.8, y + 2.5);
+      pdf.text(text[i].toUpperCase(), boxX + 1, y + 2.5);
     }
   }
 };
@@ -609,7 +642,7 @@ const drawMobileBoxes = (pdf: jsPDF, x: number, y: number, text: string) => {
     pdf.rect(boxX, y, boxSize, boxSize);
     if (i < text.length) {
       pdf.setFontSize(8);
-      pdf.text(text[i], boxX + 1.5, y + 3);
+      pdf.text(text[i], boxX + 1.5, y + 2.5);
     }
   }
 };
@@ -621,7 +654,7 @@ const drawAddressBoxes = (pdf: jsPDF, x: number, y: number, text: string, count:
     pdf.rect(boxX, y, boxSize, boxSize);
     if (i < text.length) {
       pdf.setFontSize(6);
-      pdf.text(text[i].toUpperCase(), boxX + 0.5, y + 2.2);
+      pdf.text(text[i].toUpperCase(), boxX + 0.8, y + 2.2);
     }
   }
 };
@@ -630,8 +663,8 @@ const drawAddressBoxes = (pdf: jsPDF, x: number, y: number, text: string, count:
 const drawCheckbox = (pdf: jsPDF, x: number, y: number, checked: boolean) => {
   pdf.rect(x, y, 3, 3);
   if (checked) {
-    // Draw a more visible tick mark similar to the images
-    pdf.setLineWidth(0.8);
+    // Draw a clear tick mark
+    pdf.setLineWidth(0.5);
     pdf.line(x + 0.5, y + 1.5, x + 1.2, y + 2.2);
     pdf.line(x + 1.2, y + 2.2, x + 2.5, y + 0.8);
     pdf.setLineWidth(0.2); // Reset line width
