@@ -5,6 +5,7 @@ import { toast } from '@/hooks/use-toast';
 import CharacterBoxes from './CharacterBoxes';
 import { generateVoterIdPDF } from '@/services/pdfService';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useNavigate } from 'react-router-dom';
 
 interface FormData {
   assemblyConstituencyNo: string;
@@ -66,13 +67,12 @@ interface VoterIdPreviewProps {
 
 const VoterIdPreview = ({ formData, onBack, onEdit }: VoterIdPreviewProps) => {
   const { translate, selectedLanguage } = useLanguage();
+const navigate = useNavigate();
 
-  const handleSubmit = () => {
-    toast({
-      title: translate('toast.submitSuccess') || "Form Submitted Successfully!",
-      description: translate('toast.submitDescription') || "Your voter ID application has been submitted for processing.",
-    });
-  };
+const handleAadhaarESign = () => {
+  navigate('/aadhaar-esign');
+};
+
 
   const handleDownload = async () => {
     try {
@@ -449,12 +449,13 @@ const VoterIdPreview = ({ formData, onBack, onEdit }: VoterIdPreviewProps) => {
                 {translate('button.download')}
               </Button>
               <Button 
-                onClick={handleSubmit} 
+                onClick={handleAadhaarESign} 
                 className="bg-[#33FEBF] hover:bg-[#33FEBF]/90 text-[#141E28]"
               >
                 <Send className="w-4 h-4 mr-2" />
-                {translate('button.submit')}
+                {translate('button.aadhaarESign') || 'Aadhaar e-Sign'}
               </Button>
+
             </div>
           </CardContent>
         </Card>
