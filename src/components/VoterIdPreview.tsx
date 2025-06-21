@@ -37,11 +37,11 @@ interface FormData {
   documentsAvailable: string[];
   otherDocument: string;
   uploadedFiles?: File[];
-  
+
   enableCorrectionSection?: boolean;
   enableReplacementSection?: boolean;
   enableDisabilitySection?: boolean;
-  
+
   correctionFields?: {
     name: boolean;
     gender: boolean;
@@ -54,7 +54,7 @@ interface FormData {
   };
   correctParticulars?: string;
   documentName?: string;
-  
+
   declarationDate?: string;
   declarationPlace?: string;
 }
@@ -67,11 +67,11 @@ interface VoterIdPreviewProps {
 
 const VoterIdPreview = ({ formData, onBack, onEdit }: VoterIdPreviewProps) => {
   const { translate, selectedLanguage } = useLanguage();
-const navigate = useNavigate();
+  const navigate = useNavigate();
 
-const handleAadhaarESign = () => {
-  navigate('/aadhaar-esign');
-};
+  const handleAadhaarESign = () => {
+    navigate('/aadhaar-esign');
+  };
 
 
   const handleDownload = async () => {
@@ -83,7 +83,7 @@ const handleAadhaarESign = () => {
       });
     } catch (error) {
       toast({
-        title: translate('toast.downloadFailed') || "Download Failed", 
+        title: translate('toast.downloadFailed') || "Download Failed",
         description: translate('toast.downloadError') || "There was an error generating the PDF. Please try again.",
         variant: "destructive",
       });
@@ -94,9 +94,9 @@ const handleAadhaarESign = () => {
     <div className="min-h-screen bg-[#141E28] p-6">
       <div className="max-w-5xl mx-auto">
         <div className="mb-6">
-          <Button 
-            variant="outline" 
-            onClick={onBack} 
+          <Button
+            variant="outline"
+            onClick={onBack}
             className="mb-4 border-[#33FEBF] text-[#33FEBF] hover:bg-[#33FEBF] hover:text-[#141E28]"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -106,29 +106,54 @@ const handleAadhaarESign = () => {
 
         <Card className="shadow-lg border border-[#33FEBF] bg-white">
           <CardHeader className="bg-white border-b border-black">
-            <div className="text-center space-y-2">
-              <div className="flex items-center justify-between">
+            <div className="grid grid-cols-3 items-center">
+              {/* Left: Logo */}
+              <div className="flex justify-center">
                 <div className="w-16 h-16 border border-black bg-white flex items-center justify-center">
                   <img src="/lovable-uploads/482dfa6a-6a70-440d-94e0-ce7e8009abda.png" alt="ECI Logo" className="w-12 h-12" />
                 </div>
-                <div className="flex-1 text-center">
-                  <p className="text-sm font-medium">{translate('preview.dateNotification') || 'Date of Notification:'}</p>
-                  <CardTitle className="text-lg font-bold mt-2">
-                    {translate('preview.electionCommission') || 'ELECTION COMMISSION OF INDIA'}
-                  </CardTitle>
-                  <p className="text-sm font-medium">{translate('preview.form8') || 'Form-8'}</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-sm">{translate('preview.formNo') || 'FORM No.'}</p>
-                  <p className="text-xs">{translate('preview.filledByOffice') || '(To be filled by office)'}</p>
-                </div>
               </div>
-              <p className="text-sm font-medium">
-                {translate('preview.formTitle') || 'Voter Application Form for Shifting of Residence/Correction of Entries in Existing Electoral Roll/Replacement of EPIC/Marking of PwD'}
-              </p>
-              <p className="text-xs">
-                {translate('preview.rules') || '(See Rules 13(3) and (26) of the Registration of Electors Rules, 1960)'}
-              </p>
+              {/* Center: Main Title */}
+              <div className="text-center">
+                <p className="text-sm font-medium">
+                  {translate('preview.dateNotification') !== 'preview.dateNotification'
+                    ? translate('preview.dateNotification')
+                    : 'Date of Notification:'}
+                </p>
+                <CardTitle className="text-lg font-bold mt-2">
+                  {translate('preview.electionCommission') !== 'preview.electionCommission'
+                    ? translate('preview.electionCommission')
+                    : 'ELECTION COMMISSION OF INDIA'}
+                </CardTitle>
+                <p className="text-sm font-medium">
+                  {translate('preview.form8') !== 'preview.form8'
+                    ? translate('preview.form8')
+                    : 'Form-8'}
+                </p>
+                <p className="text-sm font-medium">
+                  {translate('preview.formTitle') !== 'preview.formTitle'
+                    ? translate('preview.formTitle')
+                    : 'Voter Application Form for Shifting of Residence/Correction of Entries in Existing Electoral Roll/Replacement of EPIC/Marking of PwD'}
+                </p>
+                <p className="text-xs">
+                  {translate('preview.rules') !== 'preview.rules'
+                    ? translate('preview.rules')
+                    : '(See Rules 13(3) and (26) of the Registration of Electors Rules, 1960)'}
+                </p>
+              </div>
+              {/* Right: Form No */}
+              <div className="text-right">
+                <p className="text-sm">
+                  {translate('preview.formNo') !== 'preview.formNo'
+                    ? translate('preview.formNo')
+                    : 'FORM No.'}
+                </p>
+                <p className="text-xs">
+                  {translate('preview.filledByOffice') !== 'preview.filledByOffice'
+                    ? translate('preview.filledByOffice')
+                    : '(To be filled by office)'}
+                </p>
+              </div>
             </div>
           </CardHeader>
 
@@ -139,7 +164,7 @@ const handleAadhaarESign = () => {
               <div className="p-4 space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <span className="text-sm">{translate('preview.electoralOfficer')}</span><br/>
+                    <span className="text-sm">{translate('preview.electoralOfficer')}</span><br />
                     <span className="text-sm">{translate('preview.assemblyConstituency')}</span>
                     <div className="flex items-center space-x-2 mt-1">
                       <span className="text-sm">{translate('preview.no') || 'No.'}</span>
@@ -149,7 +174,7 @@ const handleAadhaarESign = () => {
                     </div>
                   </div>
                   <div>
-                    <span className="text-sm">{translate('preview.parliamentaryConstituency')}</span><br/>
+                    <span className="text-sm">{translate('preview.parliamentaryConstituency')}</span><br />
                     <span className="text-xs">{translate('preview.unionTerritory')}</span>
                     <div className="flex items-center space-x-2 mt-1">
                       <span className="text-sm">{translate('preview.no') || 'No.'}</span>
@@ -181,7 +206,7 @@ const handleAadhaarESign = () => {
                     <CharacterBoxes text={formData.epicNo} maxLength={10} onEdit={() => onEdit('epicNo')} />
                   </div>
                 </div>
-                
+
                 <div>
                   <span className="text-sm font-medium">{translate('preview.aadhaarDetails')}</span>
                   <div className="mt-2 space-y-2">
@@ -334,10 +359,10 @@ const handleAadhaarESign = () => {
                   ].map((doc, index) => (
                     <div key={index} className="flex items-start space-x-2">
                       <span>{index + 1}.</span>
-                      <input 
-                        type="checkbox" 
-                        checked={formData.documentsAvailable?.includes(doc)} 
-                        readOnly 
+                      <input
+                        type="checkbox"
+                        checked={formData.documentsAvailable?.includes(doc)}
+                        readOnly
                         className="mt-1"
                       />
                       <span className="text-xs">{doc}</span>
@@ -440,20 +465,22 @@ const handleAadhaarESign = () => {
 
             {/* Action Buttons */}
             <div className="flex justify-center space-x-4 pt-6 border-t">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={handleDownload}
                 className="border-[#33FEBF] text-[#33FEBF] hover:bg-[#33FEBF] hover:text-[#141E28]"
               >
                 <Download className="w-4 h-4 mr-2" />
                 {translate('button.download')}
               </Button>
-              <Button 
-                onClick={handleAadhaarESign} 
+              <Button
+                onClick={handleAadhaarESign}
                 className="bg-[#33FEBF] hover:bg-[#33FEBF]/90 text-[#141E28]"
               >
                 <Send className="w-4 h-4 mr-2" />
-                {translate('button.aadhaarESign') || 'Aadhaar e-Sign'}
+                {translate('button.aadhaarESign') !== 'button.aadhaarESign'
+                  ? translate('button.aadhaarESign')
+                  : 'Aadhaar e-Sign'}
               </Button>
 
             </div>

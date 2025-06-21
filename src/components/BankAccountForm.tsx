@@ -99,7 +99,7 @@ const BankAccountForm = () => {
           <CardHeader className="bg-[#33FEBF] text-[#141E28]">
             <CardTitle className="text-xl text-center">Enter Your Bank Account Details</CardTitle>
           </CardHeader>
-          
+
           <CardContent className="p-8 bg-white">
             <form onSubmit={handleSubmit} className="space-y-6">
               <FormItem>

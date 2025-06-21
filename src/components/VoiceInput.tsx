@@ -98,10 +98,12 @@ const VoiceInput = ({
   };
 
   const getQuestionText = () => {
-    return translate(`question.${field.key}`) || field.label;
+    // Use the field label directly for a user-friendly prompt
+    return field.label;
   };
 
   const getExampleText = () => {
+    // Optionally, you can keep this as is or improve examples
     return translate(`example.${field.key}`) || '';
   };
 
@@ -115,7 +117,7 @@ const VoiceInput = ({
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
       const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
       const recognition = new SpeechRecognition();
-      
+
       recognition.continuous = false;
       recognition.interimResults = false;
       recognition.lang = 'en-US';
@@ -177,8 +179,8 @@ const VoiceInput = ({
         <div className="mb-6">
           <div className="flex justify-between items-center mb-4">
             <div className="flex items-center space-x-4">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={onPrevious}
                 disabled={!canGoPrevious}
                 className="border-[#33FEBF] text-[#33FEBF] hover:bg-[#33FEBF] hover:text-[#141E28]"
@@ -187,15 +189,15 @@ const VoiceInput = ({
                 {translate('button.back')}
               </Button>
             </div>
-            
+
             <div className="text-center">
               <h1 className="text-[#33FEBF] text-xl font-bold">{translate('software.name')}</h1>
               <p className="text-[#33FEBF] text-sm">{translate('forms.voterId')}</p>
             </div>
-            
-            <Button 
-              variant="outline" 
-              onClick={() => navigate('/')} 
+
+            <Button
+              variant="outline"
+              onClick={() => navigate('/')}
               className="border-[#33FEBF] text-[#33FEBF] hover:bg-[#33FEBF] hover:text-[#141E28]"
             >
               <Home className="w-4 h-4 mr-2" />
@@ -210,7 +212,7 @@ const VoiceInput = ({
               {getQuestionText()}
             </CardTitle>
           </CardHeader>
-          
+
           <CardContent className="p-8 bg-white">
             <div className="space-y-6">
               <div className="relative">
@@ -234,7 +236,7 @@ const VoiceInput = ({
                     className="w-full text-lg p-4 border-2 border-[#33FEBF] focus:border-[#33FEBF] focus:ring-[#33FEBF] rounded-lg"
                   />
                 )}
-                
+
                 {getExampleText() && (
                   <Button
                     variant="ghost"
@@ -258,11 +260,10 @@ const VoiceInput = ({
               <div className="flex justify-center">
                 <Button
                   onClick={toggleListening}
-                  className={`${
-                    isListening 
-                      ? 'bg-red-500 hover:bg-red-600' 
+                  className={`${isListening
+                      ? 'bg-red-500 hover:bg-red-600'
                       : 'bg-[#33FEBF] hover:bg-[#33FEBF]/90'
-                  } text-white px-6 py-3`}
+                    } text-white px-6 py-3`}
                 >
                   {isListening ? <MicOff className="w-5 h-5 mr-2" /> : <Mic className="w-5 h-5 mr-2" />}
                   {isListening ? translate('button.stopListening') : translate('button.useVoice')}
@@ -270,8 +271,8 @@ const VoiceInput = ({
               </div>
 
               <div className="flex justify-between pt-6 border-t border-gray-200">
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   onClick={onPrevious}
                   disabled={!canGoPrevious}
                   className="border-[#33FEBF] text-[#33FEBF] hover:bg-[#33FEBF] hover:text-[#141E28]"
@@ -279,8 +280,8 @@ const VoiceInput = ({
                   <ArrowLeft className="w-4 h-4 mr-2" />
                   {translate('button.previous')}
                 </Button>
-                
-                <Button 
+
+                <Button
                   onClick={onNext}
                   disabled={!canGoNext}
                   className="bg-[#33FEBF] hover:bg-[#33FEBF]/90 text-[#141E28]"

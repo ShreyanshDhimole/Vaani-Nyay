@@ -1,20 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  FileText, 
-  Shield, 
-  Smartphone, 
-  PenTool, 
-  CheckCircle, 
-  Eye, 
-  EyeOff, 
-  Clock, 
-  Download, 
+import {
+  FileText,
+  Shield,
+  Smartphone,
+  PenTool,
+  CheckCircle,
+  Eye,
+  EyeOff,
+  Clock,
+  Download,
   Send,
   AlertCircle,
   Lock,
   Award,
-  RefreshCw
+  RefreshCw,
+  Home
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface FormData {
   aadhaarNumber: string;
@@ -36,6 +38,8 @@ const AadhaarESignPage: React.FC = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [otpTimer, setOtpTimer] = useState(300); // 5 minutes
   const [signatureProgress, setSignatureProgress] = useState(0);
+
+  const navigate = useNavigate();
 
   const steps = [
     { id: 1, title: 'Document Review', icon: FileText },
@@ -129,21 +133,21 @@ const AadhaarESignPage: React.FC = () => {
     if (!validateStep(currentStep)) return;
 
     setLoading(true);
-    
+
     // Simulate API call delay
     await new Promise(resolve => setTimeout(resolve, 1500));
-    
+
     if (currentStep === 2) {
       setOtpTimer(300); // Reset timer when moving to OTP step
     }
-    
+
     if (currentStep < 4) {
       setCurrentStep(prev => prev + 1);
     } else if (currentStep === 4) {
       setSignatureProgress(0);
       // Progress animation will handle moving to step 5
     }
-    
+
     setLoading(false);
   };
 
@@ -191,9 +195,6 @@ const AadhaarESignPage: React.FC = () => {
                   <p className="text-gray-900">June 13, 2025</p>
                 </div>
               </div>
-              <button className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-                Preview Document
-              </button>
             </div>
 
             <div className="bg-amber-50 p-4 rounded-lg border border-amber-200">
@@ -356,7 +357,7 @@ const AadhaarESignPage: React.FC = () => {
 
             <div className="space-y-4">
               <div className="w-full bg-gray-200 rounded-full h-3">
-                <div 
+                <div
                   className="bg-blue-600 h-3 rounded-full transition-all duration-300 ease-out"
                   style={{ width: `${signatureProgress}%` }}
                 ></div>
@@ -440,7 +441,14 @@ const AadhaarESignPage: React.FC = () => {
               </button>
               <button className="flex-1 flex items-center justify-center px-4 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors">
                 <Send className="h-5 w-5 mr-2" />
-                Submit to Court
+                Submit
+              </button>
+              <button
+                className="flex-1 flex items-center justify-center px-4 py-3 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors"
+                onClick={() => navigate('/forms')}
+              >
+                <Home className="h-5 w-5 mr-2" />
+                Home
               </button>
             </div>
 
@@ -477,15 +485,15 @@ const AadhaarESignPage: React.FC = () => {
               const Icon = step.icon;
               const isActive = currentStep === step.id;
               const isCompleted = currentStep > step.id;
-              
+
               return (
                 <div key={step.id} className="flex items-center">
                   <div className="flex flex-col items-center">
                     <div className={`
                       w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all
-                      ${isCompleted ? 'bg-green-600 border-green-600 text-white' : 
-                        isActive ? 'bg-blue-600 border-blue-600 text-white' : 
-                        'bg-white border-gray-300 text-gray-400'}
+                      ${isCompleted ? 'bg-green-600 border-green-600 text-white' :
+                        isActive ? 'bg-blue-600 border-blue-600 text-white' :
+                          'bg-white border-gray-300 text-gray-400'}
                     `}>
                       {isCompleted ? <CheckCircle className="h-6 w-6" /> : <Icon className="h-6 w-6" />}
                     </div>

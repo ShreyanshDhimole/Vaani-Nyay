@@ -1,8 +1,7 @@
-
 import jsPDF from 'jspdf';
 import { translateFormData } from './translationService';
 
-interface FormData {
+interface VoterFormData {
   assemblyConstituencyNo: string;
   assemblyConstituencyName: string;
   parliamentaryConstituencyNo: string;
@@ -36,6 +35,14 @@ interface FormData {
   enableCorrectionSection?: boolean;
   enableReplacementSection?: boolean;
   enableDisabilitySection?: boolean;
+
+  disabilityType?: {
+    locomotive?: boolean;
+    visual?: boolean;
+    deafDumb?: boolean;
+    other?: boolean;
+  };
+  disabilityPercentage?: string;
   
   correctionFields?: {
     name: boolean;
@@ -50,31 +57,92 @@ interface FormData {
   correctParticulars?: string;
   documentName?: string;
   
-  replacementReason?: string;
-  oldEpicStatus?: string;
-  epicCondition?: {
-    lost: boolean;
-    destroyed: boolean;
-    mutilated: boolean;
-  };
-  mutilatedDetails?: string;
-  
-  disabilityCategory?: string;
-  disabilityType?: {
-    locomotive: boolean;
-    visual: boolean;
-    deafDumb: boolean;
-    other: boolean;
-  };
-  otherDisability?: string;
-  disabilityPercentage?: string;
-  certificateAttached?: boolean;
-  
   declarationDate?: string;
   declarationPlace?: string;
+  certificateAttached?: boolean;
+
+  epicCondition?: {
+    lost?: boolean;
+    destroyed?: boolean;
+    mutilated?: boolean;
+  };
 }
 
-export const generateVoterIdPDF = async (formData: FormData, language: string = 'en'): Promise<void> => {
+interface PanFormData {
+  // Personal Details
+  title: string;
+  lastName: string;
+  firstName: string;
+  middleName: string;
+  nameToAppear: string;
+  fatherTitle: string;
+  fatherLastName: string;
+  fatherFirstName: string;
+  fatherMiddleName: string;
+  motherTitle: string;
+  motherLastName: string;
+  motherFirstName: string;
+  motherMiddleName: string;
+  dateOfBirth: string;
+  gender: string;
+  
+  // Address Details
+  residentialAddress: {
+    flatNo: string;
+    buildingName: string;
+    roadStreet: string;
+    area: string;
+    townCity: string;
+    state: string;
+    pinCode: string;
+    country: string;
+    phone: string;
+  };
+  
+  communicationAddress: {
+    sameAsResidential: boolean;
+    flatNo: string;
+    buildingName: string;
+    roadStreet: string;
+    area: string;
+    townCity: string;
+    state: string;
+    pinCode: string;
+    country: string;
+    phone: string;
+  };
+  
+  // Contact Details
+  email: string;
+  mobile: string;
+  
+  // Identity and Address Proof
+  identityProof: string;
+  addressProof: string;
+  dateOfBirthProof: string;
+  
+  // Application Details
+  applicantStatus: string;
+  sourceOfIncome: string[];
+  representativeAssessee: string;
+  
+  // For Minors/Representatives
+  representativeName: string;
+  representativeCapacity: string;
+  representativePan: string;
+  
+  // Declaration
+  declarationPlace: string;
+  declarationDate: string;
+  
+  // File uploads
+  uploadedFiles: File[];
+  
+  // Example functionality
+  useExample: boolean;
+}
+
+export const generateVoterIdPDF = async (formData: VoterFormData, language: string = 'en'): Promise<void> => {
   // Translate form data to English for PDF
   const translatedData = await translateFormData(formData, language);
   
@@ -598,6 +666,337 @@ export const generateVoterIdPDF = async (formData: FormData, language: string = 
   pdf.save('voter-id-application.pdf');
 };
 
+export const generatePanCardPDF = async (formData: PanFormData, language: string = 'en'): Promise<void> => {
+  // Translate form data to English for PDF
+  const translatedData = await translateFormData(formData, language);
+  
+  const pdf = new jsPDF('p', 'mm', 'a4');
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+  const margin = 10;
+  const contentWidth = pageWidth - (2 * margin);
+  
+  // Set font
+  pdf.setFont('helvetica', 'normal');
+  
+  // Main border
+  pdf.rect(margin, margin, contentWidth, pageHeight - 20);
+  
+  // Header section
+  pdf.setFontSize(8);
+  pdf.text('Application No:', pageWidth - 55, 18);
+  pdf.rect(pageWidth - 40, 15, 30, 8);
+  pdf.text('(For office use only)', pageWidth - 60, 30);
+  
+  // Income Tax Department Logo box
+  const logoX = margin + 5;
+  const logoY = 15;
+  pdf.rect(logoX, logoY, 20, 20);
+  
+  // Add simple logo representation
+  pdf.setFillColor(100, 100, 100);
+  pdf.circle(logoX + 10, logoY + 10, 8, 'F');
+  pdf.setFillColor(255, 255, 255);
+  pdf.circle(logoX + 10, logoY + 10, 6, 'F');
+  pdf.setFillColor(0, 0, 0);
+  
+  // Title section
+  pdf.setFontSize(12);
+  pdf.setFont('helvetica', 'bold');
+  pdf.text('APPLICATION FOR ALLOTMENT OF PERMANENT ACCOUNT NUMBER (PAN)', pageWidth / 2, 22, { align: 'center' });
+  
+  pdf.setFontSize(10);
+  pdf.text('Form 49A', pageWidth / 2, 28, { align: 'center' });
+  
+  pdf.setFontSize(8);
+  pdf.setFont('helvetica', 'normal');
+  pdf.text('[Under section 139A of the Income Tax Act, 1961 and Rule 114 of the Income Tax Rules, 1962]', pageWidth / 2, 34, { align: 'center' });
+  
+  let yPos = 45;
+  
+  // Applicant Details Section
+  pdf.setFontSize(9);
+  pdf.setFont('helvetica', 'bold');
+  pdf.text('1. APPLICANT DETAILS', margin + 5, yPos);
+  yPos += 6;
+  
+  pdf.setFont('helvetica', 'normal');
+  pdf.setFontSize(8);
+  
+  // Name section
+  pdf.text('Name of the Applicant:', margin + 5, yPos);
+  yPos += 5;
+  
+  // Title, Last name, First name, Middle name
+  pdf.text('Title', margin + 5, yPos);
+  drawPanBoxes(pdf, margin + 20, yPos - 3, translatedData.title, 4);
+  
+  pdf.text('Last Name/Surname', margin + 50, yPos);
+  drawPanBoxes(pdf, margin + 90, yPos - 3, translatedData.lastName, 20);
+  yPos += 8;
+  
+  pdf.text('First Name', margin + 5, yPos);
+  drawPanBoxes(pdf, margin + 30, yPos - 3, translatedData.firstName, 20);
+  
+  pdf.text('Middle Name', margin + 100, yPos);
+  drawPanBoxes(pdf, margin + 130, yPos - 3, translatedData.middleName, 20);
+  yPos += 10;
+  
+  // Name to appear on PAN
+  pdf.text('Name as you want it to appear on PAN card:', margin + 5, yPos);
+  yPos += 5;
+  drawPanBoxes(pdf, margin + 5, yPos - 3, translatedData.nameToAppear, 40);
+  yPos += 10;
+  
+  // Father's Details
+  pdf.text('Father\'s Name:', margin + 5, yPos);
+  yPos += 5;
+  
+  pdf.text('Title', margin + 5, yPos);
+  drawPanBoxes(pdf, margin + 20, yPos - 3, translatedData.fatherTitle, 8);
+  
+  pdf.text('Last Name/Surname', margin + 60, yPos);
+  drawPanBoxes(pdf, margin + 100, yPos - 3, translatedData.fatherLastName, 20);
+  yPos += 8;
+  
+  pdf.text('First Name', margin + 5, yPos);
+  drawPanBoxes(pdf, margin + 30, yPos - 3, translatedData.fatherFirstName, 20);
+  
+  pdf.text('Middle Name', margin + 100, yPos);
+  drawPanBoxes(pdf, margin + 130, yPos - 3, translatedData.fatherMiddleName, 20);
+  yPos += 10;
+  
+  // Mother's Details
+  pdf.text('Mother\'s Name:', margin + 5, yPos);
+  yPos += 5;
+  
+  pdf.text('Title', margin + 5, yPos);
+  drawPanBoxes(pdf, margin + 20, yPos - 3, translatedData.motherTitle, 8);
+  
+  pdf.text('Last Name/Surname', margin + 60, yPos);
+  drawPanBoxes(pdf, margin + 100, yPos - 3, translatedData.motherLastName, 20);
+  yPos += 8;
+  
+  pdf.text('First Name', margin + 5, yPos);
+  drawPanBoxes(pdf, margin + 30, yPos - 3, translatedData.motherFirstName, 20);
+  
+  pdf.text('Middle Name', margin + 100, yPos);
+  drawPanBoxes(pdf, margin + 130, yPos - 3, translatedData.motherMiddleName, 20);
+  yPos += 10;
+  
+  // Date of Birth and Gender
+  pdf.text('Date of Birth (DD/MM/YYYY):', margin + 5, yPos);
+  drawPanBoxes(pdf, margin + 65, yPos - 3, translatedData.dateOfBirth, 10);
+  
+  pdf.text('Gender:', margin + 120, yPos);
+  drawCheckbox(pdf, margin + 140, yPos - 2, translatedData.gender === 'Male');
+  pdf.text('M', margin + 148, yPos);
+  drawCheckbox(pdf, margin + 155, yPos - 2, translatedData.gender === 'Female');
+  pdf.text('F', margin + 163, yPos);
+  drawCheckbox(pdf, margin + 170, yPos - 2, translatedData.gender === 'Transgender');
+  pdf.text('T', margin + 178, yPos);
+  yPos += 15;
+  
+  // Check if we need a new page
+  if (yPos > 200) {
+    pdf.addPage();
+    yPos = 20;
+    pdf.rect(margin, margin, contentWidth, pageHeight - 20);
+  }
+  
+  // Address Details Section
+  pdf.setFont('helvetica', 'bold');
+  pdf.text('2. ADDRESS DETAILS', margin + 5, yPos);
+  yPos += 6;
+  
+  pdf.setFont('helvetica', 'normal');
+  pdf.text('Residential Address:', margin + 5, yPos);
+  yPos += 5;
+  
+  // Residential address fields
+  pdf.text('Flat/Door/Block No.', margin + 5, yPos);
+  drawPanBoxes(pdf, margin + 45, yPos - 3, translatedData.residentialAddress.flatNo, 15);
+  
+  pdf.text('Name of Premises/Building/Village', margin + 100, yPos);
+  drawPanBoxes(pdf, margin + 160, yPos - 3, translatedData.residentialAddress.buildingName, 15);
+  yPos += 8;
+  
+  pdf.text('Road/Street/Lane/Post Office', margin + 5, yPos);
+  drawPanBoxes(pdf, margin + 60, yPos - 3, translatedData.residentialAddress.roadStreet, 25);
+  yPos += 8;
+  
+  pdf.text('Area/Locality/Taluka/Sub-Division', margin + 5, yPos);
+  drawPanBoxes(pdf, margin + 65, yPos - 3, translatedData.residentialAddress.area, 25);
+  yPos += 8;
+  
+  pdf.text('Town/City/District', margin + 5, yPos);
+  drawPanBoxes(pdf, margin + 45, yPos - 3, translatedData.residentialAddress.townCity, 20);
+  
+  pdf.text('State/UT', margin + 120, yPos);
+  drawPanBoxes(pdf, margin + 140, yPos - 3, translatedData.residentialAddress.state, 15);
+  yPos += 8;
+  
+  pdf.text('PIN Code', margin + 5, yPos);
+  drawPanBoxes(pdf, margin + 25, yPos - 3, translatedData.residentialAddress.pinCode, 6);
+  
+  pdf.text('Country', margin + 60, yPos);
+  drawPanBoxes(pdf, margin + 80, yPos - 3, translatedData.residentialAddress.country, 15);
+  
+  pdf.text('Phone', margin + 130, yPos);
+  drawPanBoxes(pdf, margin + 150, yPos - 3, translatedData.residentialAddress.phone, 15);
+  yPos += 12;
+  
+  // Communication Address
+  drawCheckbox(pdf, margin + 5, yPos - 2, translatedData.communicationAddress.sameAsResidential);
+  pdf.text('Communication address same as residential address', margin + 15, yPos);
+  yPos += 8;
+  
+  if (!translatedData.communicationAddress.sameAsResidential) {
+    pdf.text('Communication Address:', margin + 5, yPos);
+    yPos += 5;
+    
+    // Communication address fields (similar to residential)
+    pdf.text('Flat/Door/Block No.', margin + 5, yPos);
+    drawPanBoxes(pdf, margin + 45, yPos - 3, translatedData.communicationAddress.flatNo, 15);
+    
+    pdf.text('Name of Premises/Building/Village', margin + 100, yPos);
+    drawPanBoxes(pdf, margin + 160, yPos - 3, translatedData.communicationAddress.buildingName, 15);
+    yPos += 8;
+    
+    // Add other communication address fields similarly
+    yPos += 25; // Space for other fields
+  }
+  
+  // Contact Details Section
+  pdf.setFont('helvetica', 'bold');
+  pdf.text('3. CONTACT DETAILS', margin + 5, yPos);
+  yPos += 6;
+  
+  pdf.setFont('helvetica', 'normal');
+  pdf.text('Email:', margin + 5, yPos);
+  pdf.line(margin + 20, yPos + 2, margin + 100, yPos + 2);
+  if (translatedData.email) {
+    pdf.text(translatedData.email, margin + 22, yPos + 1);
+  }
+  
+  pdf.text('Mobile:', margin + 110, yPos);
+  drawMobileBoxes(pdf, margin + 130, yPos - 2, translatedData.mobile);
+  yPos += 12;
+  
+  // Application Details Section
+  pdf.setFont('helvetica', 'bold');
+  pdf.text('4. APPLICATION DETAILS', margin + 5, yPos);
+  yPos += 6;
+  
+  pdf.setFont('helvetica', 'normal');
+  pdf.text('Status of Applicant:', margin + 5, yPos);
+  yPos += 4;
+  
+  const statuses = ['Individual', 'Company', 'HUF (Hindu Undivided Family)', 'Partnership Firm', 'Trust', 'Others'];
+  statuses.forEach((status, index) => {
+    const col = index % 2;
+    const row = Math.floor(index / 2);
+    const x = col === 0 ? margin + 5 : margin + (contentWidth / 2);
+    const y = yPos + (row * 5);
+    
+    drawCheckbox(pdf, x, y - 2, translatedData.applicantStatus === status);
+    pdf.text(status, x + 10, y);
+  });
+  yPos += 20;
+  
+  // Source of Income
+  pdf.text('Source of Income (Tick all applicable):', margin + 5, yPos);
+  yPos += 5;
+  
+  const incomeTypes = [
+    'Salary',
+    'House Property', 
+    'Business/Profession',
+    'Capital Gains',
+    'Other Sources',
+    'Income from abroad',
+    'No Income'
+  ];
+  
+  incomeTypes.forEach((income, index) => {
+    const col = index % 2;
+    const row = Math.floor(index / 2);
+    const x = col === 0 ? margin + 5 : margin + (contentWidth / 2);
+    const y = yPos + (row * 5);
+    
+    drawCheckbox(pdf, x, y - 2, translatedData.sourceOfIncome?.includes(income) || false);
+    pdf.text(income, x + 10, y);
+  });
+  yPos += 25;
+  
+  // Document Proofs Section
+  pdf.setFont('helvetica', 'bold');
+  pdf.text('5. DOCUMENT PROOFS', margin + 5, yPos);
+  yPos += 6;
+  
+  pdf.setFont('helvetica', 'normal');
+  pdf.text('Identity Proof: ' + translatedData.identityProof, margin + 5, yPos);
+  yPos += 5;
+  pdf.text('Address Proof: ' + translatedData.addressProof, margin + 5, yPos);
+  yPos += 5;
+  pdf.text('Date of Birth Proof: ' + translatedData.dateOfBirthProof, margin + 5, yPos);
+  yPos += 15;
+  
+  // Check if we need a new page
+  if (yPos > 200) {
+    pdf.addPage();
+    yPos = 20;
+    pdf.rect(margin, margin, contentWidth, pageHeight - 20);
+  }
+  
+  // Declaration Section
+  pdf.setFont('helvetica', 'bold');
+  pdf.text('DECLARATION', pageWidth / 2, yPos, { align: 'center' });
+  yPos += 8;
+  
+  pdf.setFont('helvetica', 'normal');
+  pdf.setFontSize(7);
+  
+  const declarationText = [
+    'I declare that the information given in this application is true and complete to the best of my knowledge and belief.',
+    'I understand that if any information given in this application is found to be false, I may be prosecuted under the Income Tax Act, 1961.',
+    'I also understand that my PAN will be allotted on the basis of the information provided in this application.',
+    'I undertake to inform any change in the particulars of information given in this application.'
+  ];
+  
+  declarationText.forEach((line, index) => {
+    pdf.text(line, margin + 5, yPos + (index * 4));
+  });
+  yPos += declarationText.length * 4 + 10;
+  
+  // Date, place and signature
+  pdf.setFontSize(8);
+  pdf.text('Place:', margin + 5, yPos);
+  pdf.line(margin + 20, yPos + 2, margin + 70, yPos + 2);
+  if (translatedData.declarationPlace) {
+    pdf.text(translatedData.declarationPlace, margin + 22, yPos + 1);
+  }
+  
+  pdf.text('Date:', margin + 80, yPos);
+  pdf.line(margin + 95, yPos + 2, margin + 130, yPos + 2);
+  if (translatedData.declarationDate) {
+    pdf.text(translatedData.declarationDate, margin + 97, yPos + 1);
+  }
+  
+  pdf.text('Signature of Applicant', contentWidth - 50, yPos);
+  yPos += 15;
+  
+  // For office use section
+  pdf.setFontSize(8);
+  pdf.rect(margin + 5, yPos, contentWidth - 10, 25);
+  pdf.text('For Office Use Only:', margin + 10, yPos + 5);
+  pdf.text('Receipt Number: ________________', margin + 10, yPos + 12);
+  pdf.text('Date: ________________', margin + 10, yPos + 18);
+
+  // Save the PDF
+  pdf.save('pan-card-application.pdf');
+};
+
 // Helper functions for different box types
 const drawSmallBoxes = (pdf: jsPDF, x: number, y: number, text: string, count: number) => {
   const boxSize = 4;
@@ -659,6 +1058,18 @@ const drawAddressBoxes = (pdf: jsPDF, x: number, y: number, text: string, count:
   }
 };
 
+const drawPanBoxes = (pdf: jsPDF, x: number, y: number, text: string, count: number) => {
+  const boxSize = 3.5;
+  for (let i = 0; i < count; i++) {
+    const boxX = x + (i * (boxSize + 0.3));
+    pdf.rect(boxX, y, boxSize, boxSize);
+    if (i < text.length) {
+      pdf.setFontSize(7);
+      pdf.text(text[i].toUpperCase(), boxX + 0.8, y + 2.5);
+    }
+  }
+};
+
 // Enhanced checkbox with better tick marks
 const drawCheckbox = (pdf: jsPDF, x: number, y: number, checked: boolean) => {
   pdf.rect(x, y, 3, 3);
@@ -668,5 +1079,52 @@ const drawCheckbox = (pdf: jsPDF, x: number, y: number, checked: boolean) => {
     pdf.line(x + 0.5, y + 1.5, x + 1.2, y + 2.2);
     pdf.line(x + 1.2, y + 2.2, x + 2.5, y + 0.8);
     pdf.setLineWidth(0.2); // Reset line width
+  }
+};
+
+// Simple translation mapping for common terms to English
+const translationMap: Record<string, string> = {
+  // Hindi to English
+  'राज कुमार शर्मा': 'Raj Kumar Sharma',
+  'दिल्ली': 'Delhi',
+  'मुंबई': 'Mumbai',
+  'गांधी नगर': 'Gandhi Nagar',
+  'केंद्रीय दिल्ली': 'Central Delhi',
+  'नई दिल्ली': 'New Delhi',
+  'महाराष्ट्र': 'Maharashtra',
+  'मुख्य सड़क': 'Main Street',
+  'केंद्रीय डाकघर': 'Central Post Office',
+  'नौकरी का स्थानांतरण': 'Job transfer',
+  'विवाह': 'Marriage',
+  
+  // Bengali to English
+  'কলকাতা': 'Kolkata',
+  'ঢাকা': 'Dhaka',
+  'চট্টগ্রাম': 'Chittagong',
+  
+  // Add more mappings as needed
+};
+
+export const translateToEnglish = async (text: string, sourceLang: string = 'auto'): Promise<string> => {
+  if (!text || sourceLang === 'en') return text;
+  
+  // First check our local mapping
+  if (translationMap[text]) {
+    return translationMap[text];
+  }
+  
+  // For numbers and basic alphanumeric, return as is
+  if (/^[a-zA-Z0-9\s\-.,@]+$/.test(text)) {
+    return text;
+  }
+  
+  try {
+    // For now, return the original text with a note that translation would happen here
+    // In a real implementation, you would use Google Translate API or similar
+    console.log(`Translation needed for: ${text} from ${sourceLang} to English`);
+    return text; // Return original text for now
+  } catch (error) {
+    console.error('Translation failed:', error);
+    return text; // Fallback to original text
   }
 };
