@@ -1,9 +1,24 @@
-import { useState } from 'react';
+import { useState,useEffect} from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
 import React, { useRef } from 'react';
+import Header from '@/components/Header';
 
 export default function Home() {
+  const location = useLocation();
+
+useEffect(() => {
+  if (location.state?.scrollToContact) {
+    const contactSection = document.getElementById("contact");
+    if (contactSection) {
+      setTimeout(() => {
+        contactSection.scrollIntoView({ behavior: "smooth" });
+      }, 100); // slight delay to wait for DOM rendering
+    }
+  }
+}, [location]);
+
   const navigate = useNavigate();
   const { translate } = useLanguage();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -16,10 +31,7 @@ export default function Home() {
   };
 const contactRef = useRef(null);
 
-const scrollToContact = () => {
-  contactRef.current?.scrollIntoView({ behavior: 'smooth' });
-};
-
+ 
   const toggleChatbot = () => {
     setIsChatbotOpen(!isChatbotOpen);
   };
@@ -52,58 +64,12 @@ const scrollToContact = () => {
   };
 
   return (
-    <div className="font-sans bg-gray-50">
+    <div className="font-sans bg-white">
       {/* Navigation Bar */}
-      <nav className="bg-white shadow-lg sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="flex justify-between items-center h-16">
-            {/* Logo */}
-            <div className="flex items-center">
-              <div className="flex-shrink-0 flex items-center">
-                <i className="fas fa-balance-scale text-indigo-600 text-2xl mr-2"></i>
-                <span className="text-xl font-bold text-indigo-600">Vaani-Nyay</span>
-              </div>
-            </div>
-            
-            {/* Primary Nav */}
-            <div className="hidden md:flex items-center space-x-8">
-              <button onClick={() => navigate('/')} className="text-indigo-600 font-medium border-b-2 border-indigo-600 px-1">Home</button>
-              <button onClick={() => navigate('/login')} className="text-gray-600 hover:text-indigo-600 transition">Apply Now</button>
-              <button onClick={() => navigate('/login')} className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">Login</button>
-              <button onClick={scrollToContact} className="text-gray-600 hover:text-indigo-600 transition"> Contact Us </button>
-              <button onClick={() => navigate('/about')} className="text-gray-600 hover:text-indigo-600 transition"> About us </button>
-
-            </div>
-            
-            {/* Mobile button */}
-            <div className="md:hidden flex items-center">
-              <button 
-                onClick={toggleMobileMenu}
-                className="mobile-menu-button p-2 rounded-md text-gray-700 hover:text-indigo-600 hover:bg-gray-100 focus:outline-none"
-              >
-                <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-              </button>
-            </div>
-          </div>
-        </div>
-        
-        {/* Mobile Menu */}
-<div className={`mobile-menu ${isMobileMenuOpen ? 'block' : 'hidden'} md:hidden bg-white shadow-lg`}>
-  <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-    <button onClick={() => navigate('/')} className="block px-3 py-2 rounded-md text-base font-medium text-indigo-600 bg-indigo-50 w-full text-left">Home</button>
-    <button onClick={() => navigate('/login')} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 w-full text-left">Apply Now</button>
-    <button onClick={() => navigate('/login')} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 w-full text-left">Login</button>
-    <button onClick={scrollToContact} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 w-full text-left">Contact Us</button>
-    <button onClick={() => navigate('/about')} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 w-full text-left">About</button>
-  </div>
-</div>
-
-      </nav>
+     <Header/>
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-indigo-600 via-purple-600 to-purple-700 text-white relative overflow-hidden">
+      <section className="bg-gradient-to-br from-[#141E28] via-[#1a2838] to-[#1e3044] text-white relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 py-24 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center">
             <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight mb-6">
@@ -115,7 +81,7 @@ const scrollToContact = () => {
             <div className="flex flex-col sm:flex-row justify-center gap-4">
               <button 
                 onClick={() => navigate('/login')}
-                className="bg-white text-indigo-600 hover:bg-gray-100 font-bold py-3 px-8 rounded-lg transition duration-300 transform hover:scale-105"
+                className="bg-[#33FEBF] text-[#141E28] hover:bg-[#2ae8af] font-bold py-3 px-8 rounded-lg transition duration-300 transform hover:scale-105"
               >
                 Start Your Legal Application
               </button>
@@ -130,17 +96,17 @@ const scrollToContact = () => {
       {/* How It Works Section */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-extrabold text-center text-gray-900 mb-12">
+          <h2 className="text-3xl font-extrabold text-center text-[#141E28] mb-12">
             How Vaani-Nyay Works
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Step 1 */}
             <div className="bg-gray-50 p-8 rounded-xl transition duration-300 ease-in-out hover:shadow-lg">
-              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-indigo-500 text-white mb-4">
+              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-[#33FEBF] text-[#141E28] mb-4">
                 <span className="text-xl font-bold">1</span>
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Speak Your Issue</h3>
+              <h3 className="text-lg font-medium text-[#141E28] mb-2">Speak Your Issue</h3>
               <p className="text-gray-600">
                 Describe your legal problem in your own words using voice or text in Hindi or English.
               </p>
@@ -148,10 +114,10 @@ const scrollToContact = () => {
             
             {/* Step 2 */}
             <div className="bg-gray-50 p-8 rounded-xl transition duration-300 ease-in-out hover:shadow-lg">
-              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-indigo-500 text-white mb-4">
+              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-[#33FEBF] text-[#141E28] mb-4">
                 <span className="text-xl font-bold">2</span>
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Auto-Generate Form</h3>
+              <h3 className="text-lg font-medium text-[#141E28] mb-2">Auto-Generate Form</h3>
               <p className="text-gray-600">
                 Our AI converts your description into a proper legal application form automatically.
               </p>
@@ -159,10 +125,10 @@ const scrollToContact = () => {
             
             {/* Step 3 */}
             <div className="bg-gray-50 p-8 rounded-xl transition duration-300 ease-in-out hover:shadow-lg">
-              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-indigo-500 text-white mb-4">
+              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-[#33FEBF] text-[#141E28] mb-4">
                 <span className="text-xl font-bold">3</span>
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Submit & Track</h3>
+              <h3 className="text-lg font-medium text-[#141E28] mb-2">Submit & Track</h3>
               <p className="text-gray-600">
                 Verify with Aadhaar OTP and submit. Track your case status anytime.
               </p>
@@ -175,7 +141,7 @@ const scrollToContact = () => {
       <section className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="lg:text-center">
-            <h2 className="text-3xl font-extrabold text-gray-900 mb-2">
+            <h2 className="text-3xl font-extrabold text-[#141E28] mb-2">
               Why Choose Vaani-Nyay?
             </h2>
             <p className="max-w-2xl mx-auto text-xl text-gray-600 mb-12">
@@ -186,10 +152,10 @@ const scrollToContact = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Feature 1 */}
             <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition duration-300 transform hover:-translate-y-1">
-              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-indigo-100 text-indigo-600 mb-4">
+              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-[#33FEBF] bg-opacity-20 text-[#33FEBF] mb-4">
                 <i className="fas fa-microphone text-xl"></i>
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Voice Interface</h3>
+              <h3 className="text-lg font-medium text-[#141E28] mb-2">Voice Interface</h3>
               <p className="text-gray-600">
                 No need to type. Speak naturally in Hindi or English.
               </p>
@@ -197,10 +163,10 @@ const scrollToContact = () => {
             
             {/* Feature 2 */}
             <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition duration-300 transform hover:-translate-y-1">
-              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-indigo-100 text-indigo-600 mb-4">
+              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-[#33FEBF] bg-opacity-20 text-[#33FEBF] mb-4">
                 <i className="fas fa-language text-xl"></i>
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Multilingual</h3>
+              <h3 className="text-lg font-medium text-[#141E28] mb-2">Multilingual</h3>
               <p className="text-gray-600">
                 Supports Hindi, English and regional languages.
               </p>
@@ -208,10 +174,10 @@ const scrollToContact = () => {
             
             {/* Feature 3 */}
             <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition duration-300 transform hover:-translate-y-1">
-              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-indigo-100 text-indigo-600 mb-4">
+              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-[#33FEBF] bg-opacity-20 text-[#33FEBF] mb-4">
                 <i className="fas fa-shield-alt text-xl"></i>
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Secure</h3>
+              <h3 className="text-lg font-medium text-[#141E28] mb-2">Secure</h3>
               <p className="text-gray-600">
                 Aadhaar-based verification ensures security.
               </p>
@@ -219,10 +185,10 @@ const scrollToContact = () => {
             
             {/* Feature 4 */}
             <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition duration-300 transform hover:-translate-y-1">
-              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-indigo-100 text-indigo-600 mb-4">
+              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-[#33FEBF] bg-opacity-20 text-[#33FEBF] mb-4">
                 <i className="fas fa-robot text-xl"></i>
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">AI Assistance</h3>
+              <h3 className="text-lg font-medium text-[#141E28] mb-2">AI Assistance</h3>
               <p className="text-gray-600">
                 Smart chatbot helps with legal questions 24/7.
               </p>
@@ -232,7 +198,7 @@ const scrollToContact = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="bg-indigo-700 text-white py-16">
+      <section className="bg-[#141E28] text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-extrabold mb-6">
             Ready to File Your Legal Application?
@@ -243,7 +209,7 @@ const scrollToContact = () => {
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <button 
               onClick={() => navigate('/login')}
-              className="bg-white text-indigo-600 hover:bg-gray-100 font-bold py-3 px-8 rounded-lg transition duration-300 transform hover:scale-105"
+              className="bg-[#33FEBF] text-[#141E28] hover:bg-[#2ae8af] font-bold py-3 px-8 rounded-lg transition duration-300 transform hover:scale-105"
             >
               Start with Voice
             </button>
@@ -255,7 +221,7 @@ const scrollToContact = () => {
       </section>
 
       {/* Footer */}
-      <footer ref={contactRef} className="bg-gray-900 text-white pt-12 pb-6">
+      <footer ref={contactRef} className="bg-[#141E28] text-white pt-11 pb-7">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
@@ -268,15 +234,15 @@ const scrollToContact = () => {
             <div>
               <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
               <ul className="space-y-2">
-                <li><button onClick={() => navigate('/login')} className="text-gray-400 hover:text-white transition">Apply Now</button></li>
-                <li><button className="text-gray-400 hover:text-white transition">Track Case</button></li>
-                <li><button className="text-gray-400 hover:text-white transition">Legal Aid</button></li>
-                <li><button className="text-gray-400 hover:text-white transition">About Us</button></li>
+                <li><button onClick={() => navigate('/login')} className="text-gray-400 hover:text-[#33FEBF] transition">Apply Now</button></li>
+                <li><button className="text-gray-400 hover:text-[#33FEBF] transition">Track Case</button></li>
+                <li><button className="text-gray-400 hover:text-[#33FEBF] transition">Legal Aid</button></li>
+                <li><button className="text-gray-400 hover:text-[#33FEBF] transition">About Us</button></li>
               </ul>
             </div>
             
             <div>
-              <h3 className="text-lg font-semibold mb-4">Contact</h3>
+              <h3 id='contact' className="text-lg font-semibold mb-4">Contact</h3>
               <ul className="space-y-2">
                 <li className="text-gray-400"><i className="fas fa-phone-alt mr-2"></i> +91 1800 123 4567</li>
                 <li className="text-gray-400"><i className="fas fa-envelope mr-2"></i> help@vaani-nyay.in</li>
@@ -287,29 +253,29 @@ const scrollToContact = () => {
             <div>
               <h3 className="text-lg font-semibold mb-4">Follow Us</h3>
               <div className="flex space-x-4">
-                <a href="#" className="text-gray-400 hover:text-white transition"><i className="fab fa-facebook-f"></i></a>
-                <a href="#" className="text-gray-400 hover:text-white transition"><i className="fab fa-twitter"></i></a>
-                <a href="#" className="text-gray-400 hover:text-white transition"><i className="fab fa-instagram"></i></a>
-                <a href="#" className="text-gray-400 hover:text-white transition"><i className="fab fa-linkedin-in"></i></a>
+                <a href="#" className="text-gray-400 hover:text-[#33FEBF] transition"><i className="fab fa-facebook-f"></i></a>
+                <a href="#" className="text-gray-400 hover:text-[#33FEBF] transition"><i className="fab fa-twitter"></i></a>
+                <a href="#" className="text-gray-400 hover:text-[#33FEBF] transition"><i className="fab fa-instagram"></i></a>
+                <a href="#" className="text-gray-400 hover:text-[#33FEBF] transition"><i className="fab fa-linkedin-in"></i></a>
               </div>
             </div>
           </div>
           
-          <div className="border-t border-gray-800 mt-8 pt-6 text-center text-gray-400">
+          <div className="border-t border-[#1e2a38] mt-8 pt-6 text-center text-gray-400">
             <p>&copy; 2023 Vaani-Nyay. All rights reserved.</p>
           </div>
         </div>
       </footer>
 
-      {/* Chatbot Button */}
+      {/* Chatbot Button
       <div className="fixed bottom-6 left-6 z-50">
         <button 
           onClick={toggleChatbot}
-          className="bg-indigo-600 text-white p-4 rounded-full shadow-lg hover:bg-indigo-700 transition duration-300"
+          className="bg-[#33FEBF] text-[#141E28] p-4 rounded-full shadow-lg hover:bg-[#2ae8af] transition duration-300"
         >
           <i className="fas fa-comment-dots text-xl"></i>
         </button>
-      </div>
+      </div> */}
 
       {/* Chatbot Modal */}
       {isChatbotOpen && (
@@ -326,7 +292,7 @@ const scrollToContact = () => {
                 <div className="sm:flex sm:items-start">
                   <div className="w-full">
                     <div className="flex justify-between items-center mb-4">
-                      <h3 className="text-lg leading-6 font-medium text-gray-900">
+                      <h3 className="text-lg leading-6 font-medium text-[#141E28]">
                         Legal Assistance Chat
                       </h3>
                       <button 
@@ -348,7 +314,7 @@ const scrollToContact = () => {
                             key={index} 
                             className={`mb-3 ${message.sender === 'user' ? 'text-right' : 'text-left'}`}
                           >
-                            <div className={`inline-block p-2 rounded-lg ${message.sender === 'user' ? 'bg-indigo-100 text-indigo-800' : 'bg-gray-200 text-gray-800'}`}>
+                            <div className={`inline-block p-2 rounded-lg ${message.sender === 'user' ? 'bg-[#33FEBF] text-[#141E28]' : 'bg-gray-200 text-gray-800'}`}>
                               {message.text}
                             </div>
                           </div>
@@ -363,11 +329,11 @@ const scrollToContact = () => {
                         onChange={(e) => setChatInput(e.target.value)}
                         onKeyPress={handleKeyPress}
                         placeholder="Type your legal question..." 
-                        className="flex-grow p-2 border rounded-l-lg focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                        className="flex-grow p-2 border rounded-l-lg focus:outline-none focus:ring-1 focus:ring-[#33FEBF]"
                       />
                       <button 
                         onClick={sendMessage}
-                        className="bg-indigo-600 text-white p-2 rounded-r-lg hover:bg-indigo-700"
+                        className="bg-[#33FEBF] text-[#141E28] p-2 rounded-r-lg hover:bg-[#2ae8af]"
                       >
                         <i className="fas fa-paper-plane"></i>
                       </button>

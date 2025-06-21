@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ArrowRight, Home, Upload } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Upload } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import VoiceInput from './VoiceInput';
 import VoterIdPreview from './VoterIdPreview';
@@ -37,12 +37,12 @@ interface FormData {
   documentsAvailable: string[];
   otherDocument: string;
   uploadedFiles: File[];
-  
+
   // Additional sections
   enableCorrectionSection: boolean;
   enableReplacementSection: boolean;
   enableDisabilitySection: boolean;
-  
+
   correctionFields: {
     name: boolean;
     gender: boolean;
@@ -55,7 +55,7 @@ interface FormData {
   };
   correctParticulars: string;
   documentName: string;
-  
+
   replacementReason: string;
   oldEpicStatus: string;
   epicCondition: {
@@ -64,7 +64,7 @@ interface FormData {
     mutilated: boolean;
   };
   mutilatedDetails: string;
-  
+
   disabilityCategory: string;
   disabilityType: {
     locomotive: boolean;
@@ -75,7 +75,7 @@ interface FormData {
   otherDisability: string;
   disabilityPercentage: string;
   certificateAttached: boolean;
-  
+
   // Declaration
   declarationDate: string;
   declarationPlace: string;
@@ -119,11 +119,11 @@ const VoterIdForm = () => {
     documentsAvailable: [],
     otherDocument: '',
     uploadedFiles: [],
-    
+
     enableCorrectionSection: false,
     enableReplacementSection: false,
     enableDisabilitySection: false,
-    
+
     correctionFields: {
       name: false,
       gender: false,
@@ -136,7 +136,7 @@ const VoterIdForm = () => {
     },
     correctParticulars: '',
     documentName: '',
-    
+
     replacementReason: '',
     oldEpicStatus: '',
     epicCondition: {
@@ -145,7 +145,7 @@ const VoterIdForm = () => {
       mutilated: false,
     },
     mutilatedDetails: '',
-    
+
     disabilityCategory: '',
     disabilityType: {
       locomotive: false,
@@ -156,7 +156,7 @@ const VoterIdForm = () => {
     otherDisability: '',
     disabilityPercentage: '',
     certificateAttached: false,
-    
+
     declarationDate: '',
     declarationPlace: '',
     acknowledgeNumber: '',
@@ -176,10 +176,10 @@ const VoterIdForm = () => {
     { key: 'mobileNoRelative', label: 'Mobile Number of Father/Mother/Any other relative', type: 'text', section: 'contact' },
     { key: 'emailSelf', label: 'Email ID of Self', type: 'email', section: 'contact' },
     { key: 'emailRelative', label: 'Email ID of Father/Mother/Any other relative', type: 'email', section: 'contact' },
-    { 
-      key: 'applicationType', 
-      label: 'I submit application for (Tick any one of the following)', 
-      type: 'radio', 
+    {
+      key: 'applicationType',
+      label: 'I submit application for (Tick any one of the following)',
+      type: 'radio',
       section: 'application',
       options: [
         'Shifting of Residence',
@@ -189,7 +189,7 @@ const VoterIdForm = () => {
       ]
     },
     { key: 'shiftingReason', label: 'Application for Shifting of Residence - Reason', type: 'textarea', section: 'application' },
-    
+
     // Address fields with proper labels
     { key: 'presentAddress.houseNo', label: 'House/Building/Apartment Number', type: 'text', section: 'address' },
     { key: 'presentAddress.streetArea', label: 'Street/Area/Locality/Mohalla/Road', type: 'text', section: 'address' },
@@ -199,7 +199,7 @@ const VoterIdForm = () => {
     { key: 'presentAddress.tehsilTaluka', label: 'Tehsil/Taluka/Mandal', type: 'text', section: 'address' },
     { key: 'presentAddress.district', label: 'District', type: 'text', section: 'address' },
     { key: 'presentAddress.stateUt', label: 'State/UT', type: 'text', section: 'address' },
-    
+
     // Documents
     {
       key: 'documentsAvailable',
@@ -218,7 +218,7 @@ const VoterIdForm = () => {
     },
     { key: 'otherDocument', label: 'Any Other Document (Please Specify)', type: 'text', section: 'documents' },
     { key: 'uploadedFiles', label: 'Upload Supporting Documents', type: 'file', section: 'documents' },
-    
+
     // Additional sections enablement
     { key: 'enableCorrectionSection', label: 'Do you want to fill the Correction of Entries section?', type: 'radio', section: 'additional', options: ['Yes', 'No'] },
     { key: 'enableReplacementSection', label: 'Do you want to fill the Replacement EPIC section?', type: 'radio', section: 'additional', options: ['Yes', 'No'] },
@@ -239,7 +239,7 @@ const VoterIdForm = () => {
       { key: 'correctParticulars', label: 'The correct particulars in the entry to be corrected are as under', type: 'textarea', section: 'correction' },
       { key: 'documentName', label: 'Name of Document in support of above claim attached', type: 'text', section: 'correction' },
     ] : []),
-    
+
     // Replacement fields (only if enabled)
     ...(formData.enableReplacementSection ? [
       { key: 'replacementReason', label: 'I request that a replacement EPIC may be issued to me due to change in my personal details', type: 'textarea', section: 'replacement' },
@@ -253,7 +253,7 @@ const VoterIdForm = () => {
       },
       { key: 'mutilatedDetails', label: 'If mutilated, provide details', type: 'textarea', section: 'replacement' },
     ] : []),
-    
+
     // Disability fields (only if enabled)
     ...(formData.enableDisabilitySection ? [
       { key: 'disabilityCategory', label: 'Category of disability (Tick the appropriate box for category of disability)', type: 'text', section: 'disability' },
@@ -274,7 +274,7 @@ const VoterIdForm = () => {
         options: ['Yes', 'No']
       },
     ] : []),
-    
+
     // Declaration fields
     { key: 'declarationDate', label: 'Declaration Date', type: 'text', section: 'declaration' },
     { key: 'declarationPlace', label: 'Declaration Place', type: 'text', section: 'declaration' },
@@ -399,32 +399,24 @@ const VoterIdForm = () => {
       <div className="max-w-4xl mx-auto">
         <div className="mb-6">
           <div className="flex justify-between items-center mb-4">
-            <Button 
-              variant="outline" 
-              onClick={() => navigate('/')} 
+            <Button
+              variant="outline"
+              onClick={() => navigate('/')} // This will take user to the forms listing page
               className="border-[#33FEBF] text-[#33FEBF] hover:bg-[#33FEBF] hover:text-[#141E28]"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
-              {translate('button.back')}
+              {translate('button.back') || 'Back to Forms'}
             </Button>
-            
-            <Button 
-              variant="outline" 
-              onClick={() => navigate('/')} 
-              className="border-[#33FEBF] text-[#33FEBF] hover:bg-[#33FEBF] hover:text-[#141E28]"
-            >
-              <Home className="w-4 h-4 mr-2" />
-              {translate('button.home')}
-            </Button>
+            {/* Home button removed */}
           </div>
-          
+
           <div className="bg-[#33FEBF] text-[#141E28] p-2 rounded mb-4">
             <p className="text-sm font-medium">
               {translate('step.label') || 'Step'} {currentStep + 1} {translate('of.label') || 'of'} {formFields.length} - {currentField.section.toUpperCase()} {translate('section.label') || 'SECTION'}
             </p>
             <div className="w-full bg-[#141E28] rounded-full h-2 mt-2">
-              <div 
-                className="bg-[#33FEBF] h-2 rounded-full transition-all duration-300" 
+              <div
+                className="bg-[#33FEBF] h-2 rounded-full transition-all duration-300"
                 style={{ width: `${((currentStep + 1) / formFields.length) * 100}%` }}
               ></div>
             </div>
@@ -438,7 +430,7 @@ const VoterIdForm = () => {
             </CardTitle>
             <p className="text-center text-sm">{translate('form.subtitle')}</p>
           </CardHeader>
-          
+
           <CardContent className="p-8 bg-white">
             <div className="space-y-6">
               <div className="text-center mb-8">
@@ -450,16 +442,16 @@ const VoterIdForm = () => {
               {currentField.type === 'radio' && (
                 <div className="space-y-4">
                   {currentField.options?.map((option) => (
-                    <label key={option} className="flex items-center space-x-3 cursor-pointer">
+                    <label key={option} className="flex items-center">
                       <input
                         type="radio"
                         name={currentField.key}
                         value={option}
                         checked={getCurrentValue(currentField.key) === option}
                         onChange={(e) => handleInputChange(currentField.key, e.target.value)}
-                        className="w-4 h-4 text-[#33FEBF]"
+                        className="w-4 h-4"
                       />
-                      <span className="text-[#141E28]">{option}</span>
+                      <span className="ml-2">{option}</span>
                     </label>
                   ))}
                 </div>
@@ -473,15 +465,15 @@ const VoterIdForm = () => {
                         type="checkbox"
                         value={option}
                         checked={
-                          currentField.key === 'documentsAvailable' 
+                          currentField.key === 'documentsAvailable'
                             ? (formData.documentsAvailable || []).includes(option)
                             : currentField.key === 'correctionFields'
-                            ? (formData.correctionFields as any)[option.toLowerCase().replace(/[^a-z]/g, '')]
-                            : currentField.key === 'epicCondition'
-                            ? (formData.epicCondition as any)[option.toLowerCase().split(' ')[0]]
-                            : currentField.key === 'disabilityType'
-                            ? (formData.disabilityType as any)[option.toLowerCase().replace(/[^a-z]/g, '')]
-                            : false
+                              ? (formData.correctionFields as any)[option.toLowerCase().replace(/[^a-z]/g, '')]
+                              : currentField.key === 'epicCondition'
+                                ? (formData.epicCondition as any)[option.toLowerCase().split(' ')[0]]
+                                : currentField.key === 'disabilityType'
+                                  ? (formData.disabilityType as any)[option.toLowerCase().replace(/[^a-z]/g, '')]
+                                  : false
                         }
                         onChange={(e) => {
                           if (currentField.key === 'documentsAvailable') {
@@ -529,7 +521,7 @@ const VoterIdForm = () => {
                       {translate('button.uploadFile')} (PDF, Images, Documents)
                     </label>
                   </div>
-                  
+
                   {formData.uploadedFiles.length > 0 && (
                     <div className="mt-4">
                       <h4 className="font-medium text-[#141E28] mb-2">Uploaded Files:</h4>
@@ -555,18 +547,18 @@ const VoterIdForm = () => {
               )}
 
               <div className="flex justify-between pt-6 border-t border-gray-200">
-                <Button 
-                  variant="outline" 
-                  onClick={prevStep} 
+                <Button
+                  variant="outline"
+                  onClick={prevStep}
                   disabled={currentStep === 0}
                   className="border-[#33FEBF] text-[#33FEBF] hover:bg-[#33FEBF] hover:text-[#141E28]"
                 >
                   <ArrowLeft className="w-4 h-4 mr-2" />
                   {translate('button.previous')}
                 </Button>
-                
-                <Button 
-                  onClick={nextStep} 
+
+                <Button
+                  onClick={nextStep}
                   className="bg-[#33FEBF] hover:bg-[#33FEBF]/90 text-[#141E28]"
                 >
                   {currentStep === formFields.length - 1 ? (translate('button.preview') || 'Preview') : (translate('button.next') || 'Next')}

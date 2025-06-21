@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Construction } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import PanCardForm from '@/components/PanCardForm';
 
 const FormPage = () => {
   const { formId } = useParams();
@@ -17,6 +18,9 @@ const FormPage = () => {
 
   if (formId === 'voter-id') {
     return <VoterIdForm />;
+  }
+  if (formId === 'pan-card') {
+    return <PanCardForm />;
   }
 
   // Placeholder for other forms
@@ -31,7 +35,7 @@ const FormPage = () => {
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Forms
         </Button>
-        
+
         <Card className="text-center py-12 border border-[#33FEBF] bg-white">
           <CardHeader>
             <Construction className="w-16 h-16 mx-auto mb-4 text-[#33FEBF]" />

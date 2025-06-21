@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,6 +16,7 @@ const Index = () => {
   const forms = [
     { id: 'bank-account', key: 'forms.bankAccount', category: 'banking', icon: Building2, color: 'bg-blue-50 hover:bg-blue-100 border-blue-200' },
     { id: 'voter-id', key: 'forms.voterId', category: 'identity', icon: CreditCard, color: 'bg-green-50 hover:bg-green-100 border-green-200' },
+    { id: 'pan-card', key: 'forms.panCard', category: 'identity', icon: CreditCard, color: 'bg-yellow-50 hover:bg-yellow-100 border-yellow-200' },
     { id: 'rti', key: 'forms.rti', category: 'legal', icon: Scale, color: 'bg-purple-50 hover:bg-purple-100 border-purple-200' },
     { id: 'unpaid-salary', key: 'forms.unpaidSalary', category: 'legal', icon: FileText, color: 'bg-orange-50 hover:bg-orange-100 border-orange-200' },
     { id: 'epf', key: 'forms.epf', category: 'banking', icon: Building2, color: 'bg-indigo-50 hover:bg-indigo-100 border-indigo-200' },
@@ -79,7 +79,7 @@ const Index = () => {
               </p>
             </div>
           </div>
-          
+
           {/* Language Selection */}
           <div className="max-w-xs mx-auto mb-8">
             <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
@@ -111,7 +111,7 @@ const Index = () => {
                   className="pl-10 border-[#33FEBF]/30 focus:border-[#33FEBF] focus:ring-[#33FEBF] bg-white"
                 />
               </div>
-              
+
               <Select value={selectedCategory} onValueChange={setSelectedCategory}>
                 <SelectTrigger className="w-full md:w-64 border-[#33FEBF]/30 focus:ring-[#33FEBF] bg-white">
                   <SelectValue />
@@ -148,7 +148,7 @@ const Index = () => {
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="pt-0">
-                    <Button 
+                    <Button
                       className="w-full bg-[#33FEBF] hover:bg-[#33FEBF]/90 text-[#141E28] font-medium border-0 group-hover:shadow-md transition-all duration-300"
                       size="sm"
                     >
