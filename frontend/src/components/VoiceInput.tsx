@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, ArrowRight, Home, Mic, MicOff, HelpCircle } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Mic, MicOff, HelpCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { toast } from '@/hooks/use-toast';
@@ -176,33 +176,21 @@ const VoiceInput = ({
     <div className="min-h-screen bg-[#141E28] p-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="mb-6">
-          <div className="flex justify-between items-center mb-4">
-            <div className="flex items-center space-x-4">
-              <Button
-                variant="outline"
-                onClick={onPrevious}
-                disabled={!canGoPrevious}
-                className="border-[#33FEBF] text-[#33FEBF] hover:bg-[#33FEBF] hover:text-[#141E28]"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                {translate('button.back')}
-              </Button>
-            </div>
-
-            <div className="text-center">
-              <h1 className="text-[#33FEBF] text-xl font-bold">{translate('software.name')}</h1>
-              <p className="text-[#33FEBF] text-sm">{translate('forms.voterId')}</p>
-            </div>
-
+        <div className="flex flex-col items-center mb-6">
+          <div className="flex items-center w-full mb-2">
             <Button
               variant="outline"
-              onClick={() => navigate('/')}
-              className="border-[#33FEBF] text-[#33FEBF] hover:bg-[#33FEBF] hover:text-[#141E28]"
+              onClick={() => navigate('/forms')}
+              className="border-[#33FEBF] text-[#33FEBF] hover:bg-[#33FEBF] hover:text-[#141E28] mr-4"
             >
-              <Home className="w-4 h-4 mr-2" />
-              {translate('button.home')}
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              {translate('button.back') || 'Back to Forms'}
             </Button>
+            <div className="flex-1">
+              <h1 className="text-[#33FEBF] text-2xl font-bold text-center mb-1">
+                {translate('software.name')}
+              </h1>
+            </div>
           </div>
         </div>
 
@@ -261,8 +249,8 @@ const VoiceInput = ({
                 <Button
                   onClick={toggleListening}
                   className={`${isListening
-                      ? 'bg-red-500 hover:bg-red-600'
-                      : 'bg-[#33FEBF] hover:bg-[#33FEBF]/90'
+                    ? 'bg-red-500 hover:bg-red-600'
+                    : 'bg-[#33FEBF] hover:bg-[#33FEBF]/90'
                     } text-white px-6 py-3`}
                 >
                   {isListening ? <MicOff className="w-5 h-5 mr-2" /> : <Mic className="w-5 h-5 mr-2" />}

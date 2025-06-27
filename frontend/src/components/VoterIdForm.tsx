@@ -401,7 +401,7 @@ const VoterIdForm = () => {
           <div className="flex justify-between items-center mb-4">
             <Button
               variant="outline"
-              onClick={() => navigate('/')} // This will take user to the forms listing page
+              onClick={() => navigate('/forms')} // This will take user to the forms listing page
               className="border-[#33FEBF] text-[#33FEBF] hover:bg-[#33FEBF] hover:text-[#141E28]"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />

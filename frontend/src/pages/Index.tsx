@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -64,110 +64,131 @@ const Index = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-gray-50 to-[#33FEBF]/5">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <div className="flex items-center justify-center mb-6">
-            <Globe className="w-12 h-12 text-[#33FEBF] mr-4" />
-            <div>
-              <h1 className="text-4xl font-bold text-[#141E28] mb-2">
-                {translate('forms.title')}
-              </h1>
-              <p className="text-lg text-gray-600">
-                {translate('forms.subtitle')}
-              </p>
-            </div>
-          </div>
-
-          {/* Language Selection */}
-          <div className="max-w-xs mx-auto mb-8">
-            <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
-              <SelectTrigger className="w-full border-[#33FEBF] focus:ring-[#33FEBF]">
-                <SelectValue placeholder={translate('language.select')} />
-              </SelectTrigger>
-              <SelectContent className="bg-white">
-                {languages.map((lang) => (
-                  <SelectItem key={lang.code} value={lang.code} className="hover:bg-[#33FEBF]/10">
-                    {lang.nativeName}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-white via-gray-50 to-[#33FEBF]/5">
+      {/* Navigation Bar */}
+      <nav className="w-full bg-[#141E28] text-[#33FEBF] px-6 py-4 flex items-center justify-between shadow">
+        <div className="text-2xl font-bold">Vaani-Nyay</div>
+        <div>
+          <Link
+            to="/home"
+            className="text-[#33FEBF] hover:underline font-medium px-4 py-2 rounded transition"
+          >
+            Go to Dashboard
+          </Link>
         </div>
+      </nav>
 
-        {/* Search and Filter */}
-        <div className="max-w-4xl mx-auto mb-8">
-          <div className="bg-white rounded-xl shadow-lg border border-[#33FEBF]/20 p-6">
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <Input
-                  type="text"
-                  placeholder={translate('search.placeholder')}
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 border-[#33FEBF]/30 focus:border-[#33FEBF] focus:ring-[#33FEBF] bg-white"
-                />
+      {/* Main Content */}
+      <div className="flex-1">
+        <div className="container mx-auto px-4 py-8">
+          {/* Header */}
+          <div className="text-center mb-12">
+            <div className="flex items-center justify-center mb-6">
+              <Globe className="w-12 h-12 text-[#33FEBF] mr-4" />
+              <div>
+                <h1 className="text-4xl font-bold text-[#141E28] mb-2">
+                  {translate('forms.title')}
+                </h1>
+                <p className="text-lg text-gray-600">
+                  {translate('forms.subtitle')}
+                </p>
               </div>
+            </div>
 
-              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                <SelectTrigger className="w-full md:w-64 border-[#33FEBF]/30 focus:ring-[#33FEBF] bg-white">
-                  <SelectValue />
+            {/* Language Selection */}
+            <div className="max-w-xs mx-auto mb-8">
+              <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
+                <SelectTrigger className="w-full border-[#33FEBF] focus:ring-[#33FEBF]">
+                  <SelectValue placeholder={translate('language.select')} />
                 </SelectTrigger>
                 <SelectContent className="bg-white">
-                  {categories.map((category) => (
-                    <SelectItem key={category.id} value={category.id} className="hover:bg-[#33FEBF]/10">
-                      {translate(category.key) || category.label}
+                  {languages.map((lang) => (
+                    <SelectItem key={lang.code} value={lang.code} className="hover:bg-[#33FEBF]/10">
+                      {lang.nativeName}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
           </div>
-        </div>
 
-        {/* Forms Grid */}
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredForms.map((form) => {
-              const IconComponent = form.icon;
-              return (
-                <Card
-                  key={form.id}
-                  className={`cursor-pointer transition-all duration-300 transform hover:scale-105 hover:shadow-xl ${form.color} border-2 group`}
-                  onClick={() => navigate(`/form/${form.id}`)}
-                >
-                  <CardHeader className="text-center pb-3">
-                    <div className="mx-auto mb-3 p-3 rounded-full bg-white/80 group-hover:bg-white transition-colors duration-300">
-                      <IconComponent className="w-8 h-8 text-[#141E28]" />
-                    </div>
-                    <CardTitle className="text-sm font-semibold text-[#141E28] leading-tight group-hover:text-[#141E28] transition-colors duration-300">
-                      {translate(form.key)}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <Button
-                      className="w-full bg-[#33FEBF] hover:bg-[#33FEBF]/90 text-[#141E28] font-medium border-0 group-hover:shadow-md transition-all duration-300"
-                      size="sm"
-                    >
-                      <FileText className="w-4 h-4 mr-2" />
-                      Fill Form
-                    </Button>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-        </div>
+          {/* Search and Filter */}
+          <div className="max-w-4xl mx-auto mb-8">
+            <div className="bg-white rounded-xl shadow-lg border border-[#33FEBF]/20 p-6">
+              <div className="flex flex-col md:flex-row gap-4">
+                <div className="flex-1 relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <Input
+                    type="text"
+                    placeholder={translate('search.placeholder')}
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 border-[#33FEBF]/30 focus:border-[#33FEBF] focus:ring-[#33FEBF] bg-white"
+                  />
+                </div>
 
-        {filteredForms.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-gray-500 text-lg">No forms found matching your search.</p>
+                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                  <SelectTrigger className="w-full md:w-64 border-[#33FEBF]/30 focus:ring-[#33FEBF] bg-white">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white">
+                    {categories.map((category) => (
+                      <SelectItem key={category.id} value={category.id} className="hover:bg-[#33FEBF]/10">
+                        {translate(category.key) || category.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
           </div>
-        )}
+
+          {/* Forms Grid */}
+          <div className="max-w-7xl mx-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {filteredForms.map((form) => {
+                const IconComponent = form.icon;
+                return (
+                  <Card
+                    key={form.id}
+                    className={`cursor-pointer transition-all duration-300 transform hover:scale-105 hover:shadow-xl ${form.color} border-2 group`}
+                    onClick={() => navigate(`/form/${form.id}`)}
+                  >
+                    <CardHeader className="text-center pb-3">
+                      <div className="mx-auto mb-3 p-3 rounded-full bg-white/80 group-hover:bg-white transition-colors duration-300">
+                        <IconComponent className="w-8 h-8 text-[#141E28]" />
+                      </div>
+                      <CardTitle className="text-sm font-semibold text-[#141E28] leading-tight group-hover:text-[#141E28] transition-colors duration-300">
+                        {translate(form.key)}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <Button
+                        className="w-full bg-[#33FEBF] hover:bg-[#33FEBF]/90 text-[#141E28] font-medium border-0 group-hover:shadow-md transition-all duration-300"
+                        size="sm"
+                      >
+                        <FileText className="w-4 h-4 mr-2" />
+                        Fill Form
+                      </Button>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          </div>
+
+          {filteredForms.length === 0 && (
+            <div className="text-center py-12">
+              <p className="text-gray-500 text-lg">No forms found matching your search.</p>
+            </div>
+          )}
+        </div>
       </div>
+
+      {/* Footer */}
+      <footer className="w-full bg-[#141E28] text-[#33FEBF] text-center py-4 mt-8">
+        © {new Date().getFullYear()} Vaani-Nyay. All rights reserved.
+      </footer>
     </div>
   );
 };
