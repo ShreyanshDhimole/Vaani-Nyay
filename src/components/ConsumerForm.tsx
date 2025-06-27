@@ -199,16 +199,19 @@ const ConsumerForm = () => {
   if (!['radio'].includes(currentField.type)) {
     return (
       <VoiceInput
-        value={getCurrentValue(currentField.key)}
-        onChange={(value) => handleInputChange(currentField.key, value)}
-        placeholder={`Enter ${currentField.label.toLowerCase()}`}
-        field={currentField}
-        onNext={nextStep}
-        onPrevious={prevStep}
-        canGoNext={true}
-        canGoPrevious={currentStep > 0 || showPreview || editingField !== null}
-        isLastField={currentStep === formFields.length - 1}
-      />
+      value={getCurrentValue(currentField.key)}
+      onChange={(value) => handleInputChange(currentField.key, value)}
+      placeholder={`Enter ${currentField.label.toLowerCase()}`}
+      field={currentField}
+      onNext={nextStep}
+      onPrevious={prevStep}
+      canGoNext={true}
+      canGoPrevious={currentStep > 0 || showPreview || editingField !== null}
+      isLastField={currentStep === formFields.length - 1}
+      currentStep={currentStep}
+      totalSteps={formFields.length}
+      sectionLabel={currentField.section ? currentField.section.toUpperCase() : undefined}
+    />
     );
   }
 

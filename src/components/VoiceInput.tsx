@@ -24,6 +24,9 @@ interface VoiceInputProps {
   canGoNext: boolean;
   canGoPrevious: boolean;
   isLastField: boolean;
+  currentStep: number;
+  totalSteps: number;
+  sectionLabel?: string;
 }
 
 const VoiceInput = ({
@@ -35,7 +38,10 @@ const VoiceInput = ({
   onPrevious,
   canGoNext,
   canGoPrevious,
-  isLastField
+  isLastField,
+  currentStep,
+  totalSteps,
+  sectionLabel
 }: VoiceInputProps) => {
   const navigate = useNavigate();
   const { translate } = useLanguage();
@@ -175,6 +181,18 @@ const VoiceInput = ({
   return (
     <div className="min-h-screen bg-[#141E28] p-4">
       <div className="max-w-4xl mx-auto">
+        {/* Progress Bar - always visible, white slider */}
+        <div className="bg-[#33FEBF] text-[#141E28] p-2 rounded mb-4">
+          <p className="text-sm font-medium">
+            {`Step ${currentStep + 1} of ${totalSteps}${sectionLabel ? ` - ${sectionLabel}` : field.section ? ` - ${field.section.toUpperCase()} SECTION` : ''}`}
+          </p>
+          <div className="w-full bg-[#141E28] rounded-full h-2 mt-2">
+            <div
+              className="bg-white h-2 rounded-full transition-all duration-300"
+              style={{ width: `${((currentStep + 1) / totalSteps) * 100}%` }}
+            ></div>
+          </div>
+        </div>
         {/* Header */}
         <div className="mb-6">
           <div className="flex justify-between items-center mb-4">
@@ -192,7 +210,6 @@ const VoiceInput = ({
 
             <div className="text-center">
               <h1 className="text-[#33FEBF] text-xl font-bold">{translate('software.name')}</h1>
-              <p className="text-[#33FEBF] text-sm">{translate('forms.voterId')}</p>
             </div>
 
             <Button
