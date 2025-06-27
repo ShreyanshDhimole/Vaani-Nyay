@@ -15,6 +15,7 @@ const translations: Record<string, Record<string, string>> = {
     'forms.title': 'Government Forms',
     'forms.subtitle': 'Digital form filling made easy',
     'forms.bankAccount': 'Bank Account Opening Form',
+    'forms.panCard': 'PAN Card Application Form',
     'forms.voterId': 'Voter ID Application Form',
     'forms.rti': 'RTI Application Form',
     'forms.unpaidSalary': 'Unpaid Salary Complaint',

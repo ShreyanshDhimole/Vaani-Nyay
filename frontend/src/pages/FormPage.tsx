@@ -7,6 +7,9 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, Construction } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import PanCardForm from '@/components/PanCardForm';
+import RTIForm from '@/components/RTIForm';
+import ConsumerForm from '@/components/ConsumerForm';
+
 
 const FormPage = () => {
   const { formId } = useParams();
@@ -21,6 +24,12 @@ const FormPage = () => {
   }
   if (formId === 'pan-card') {
     return <PanCardForm />;
+  }
+   if(formId === 'rti'){
+    return <RTIForm />;
+  }
+  if(formId === 'consumer'){
+    return <ConsumerForm />;
   }
 
   // Placeholder for other forms

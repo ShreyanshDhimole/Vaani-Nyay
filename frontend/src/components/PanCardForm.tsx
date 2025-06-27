@@ -562,16 +562,19 @@ const PanCardForm = () => {
   if (!['radio', 'checkbox', 'file'].includes(currentField.type)) {
     return (
       <VoiceInput
-        value={getCurrentValue(currentField.key)}
-        onChange={(value) => handleInputChange(currentField.key, value)}
-        placeholder={`Enter ${currentField.label.toLowerCase()}`}
-        field={currentField}
-        onNext={nextStep}
-        onPrevious={prevStep}
-        canGoNext={true}
-        canGoPrevious={currentStep > 0 || showPreview || editingField !== null}
-        isLastField={currentStep === visibleFields.length - 1}
-      />
+      value={getCurrentValue(currentField.key)}
+      onChange={(value) => handleInputChange(currentField.key, value)}
+      placeholder={`Enter ${currentField.label.toLowerCase()}`}
+      field={currentField}
+      onNext={nextStep}
+      onPrevious={prevStep}
+      canGoNext={true}
+      canGoPrevious={currentStep > 0 || showPreview || editingField !== null}
+      isLastField={currentStep === formFields.length - 1}
+      currentStep={currentStep}
+      totalSteps={formFields.length}
+      sectionLabel={currentField.section ? currentField.section.toUpperCase() : undefined}
+    />
     );
   }
 
@@ -583,7 +586,7 @@ const PanCardForm = () => {
           <div className="flex justify-between items-center mb-4">
             <Button
               variant="outline"
-              onClick={() => navigate('/forms')} // This will take user to the forms listing page
+              onClick={() => navigate('/')} // This will take user to the forms listing page
               className="border-[#33FEBF] text-[#33FEBF] hover:bg-[#33FEBF] hover:text-[#141E28]"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FaUser, FaLock, FaEnvelope, FaPhone, FaEye, FaEyeSlash, FaSignInAlt } from 'react-icons/fa';
 
 const Register = () => {
@@ -17,104 +17,44 @@ const Register = () => {
   const [success, setSuccess] = useState(false);
   const navigate = useNavigate();
 
-  const API_BASE_URL = 'http://localhost:5000/api';
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
-    // Clear error when user starts typing
-    if (error) setError('');
-  };
-
-  const validateForm = () => {
-    if (!formData.name.trim()) {
-      setError('Name is required');
-      return false;
-    }
-    if (formData.name.trim().length < 2) {
-      setError('Name must be at least 2 characters long');
-      return false;
-    }
-    if (!formData.email.trim()) {
-      setError('Email is required');
-      return false;
-    }
-    if (!formData.phone.trim()) {
-      setError('Phone number is required');
-      return false;
-    }
-    if (!/^[6-9]\d{9}$/.test(formData.phone.trim())) {
-      setError('Please enter a valid Indian phone number');
-      return false;
-    }
-    if (!formData.password) {
-      setError('Password is required');
-      return false;
-    }
-    if (formData.password.length < 8) {
-      setError('Password must be at least 8 characters long');
-      return false;
-    }
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
-      return false;
-    }
-    return true;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if (!validateForm()) {
-      return;
-    }
-
     setLoading(true);
     setError('');
 
+    // Simple validation
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      setLoading(false);
+      return;
+    }
+
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/register`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData)
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Registration failed');
-      }
-
-      // Store token and user info
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
-
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
       // Show success message
       setSuccess(true);
-      const registerCard = document.querySelector('.register-card');
-      if (registerCard) {
-        registerCard.classList.add('animate-pulse');
-      }
+      document.querySelector('.register-card').classList.add('animate-pulse');
       
-      // Redirect to forms dashboard after 2 seconds
+      // Redirect to login after 2 seconds
       setTimeout(() => {
-        navigate('/forms');
+        navigate('/login');
       }, 2000);
-
     } catch (err) {
-      setError(err.message || 'Registration failed. Please try again.');
-      const registerCard = document.querySelector('.register-card');
-      if (registerCard) {
-        registerCard.classList.add('animate-shake');
-        setTimeout(() => {
-          registerCard.classList.remove('animate-shake');
-        }, 1000);
-      }
+      setError('Registration failed. Please try again.');
+      document.querySelector('.register-card').classList.add('animate-shake');
+      setTimeout(() => {
+        document.querySelector('.register-card').classList.remove('animate-shake');
+      }, 1000);
     } finally {
       setLoading(false);
     }
@@ -160,7 +100,7 @@ const Register = () => {
                 </svg>
               </div>
               <h3 className="text-xl font-semibold text-[#33FEBF] mb-2">Registration Successful!</h3>
-              <p className="text-gray-300">Welcome to Vaani-Nyay! You will be redirected shortly.</p>
+              <p className="text-gray-300">You will be redirected to login shortly.</p>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-5">
@@ -184,8 +124,7 @@ const Register = () => {
                     onChange={handleChange}
                     required
                     placeholder="Enter your full name"
-                    className="w-full pl-10 pr-4 py-3 rounded-lg bg-[#1E293B] text-white placeholder-gray-400 border border-[#334155] focus:outline-none focus:ring-2 focus:ring-[#33FEBF] transition-colors"
-                    disabled={loading}
+                    className="w-full pl-10 pr-4 py-3 rounded-lg bg-[#1E293B] text-white placeholder-gray-400 border border-[#334155] focus:outline-none focus:ring-2 focus:ring-[#33FEBF]"
                   />
                 </div>
               </div>
@@ -204,8 +143,7 @@ const Register = () => {
                     onChange={handleChange}
                     required
                     placeholder="Enter your email"
-                    className="w-full pl-10 pr-4 py-3 rounded-lg bg-[#1E293B] text-white placeholder-gray-400 border border-[#334155] focus:outline-none focus:ring-2 focus:ring-[#33FEBF] transition-colors"
-                    disabled={loading}
+                    className="w-full pl-10 pr-4 py-3 rounded-lg bg-[#1E293B] text-white placeholder-gray-400 border border-[#334155] focus:outline-none focus:ring-2 focus:ring-[#33FEBF]"
                   />
                 </div>
               </div>
@@ -224,11 +162,9 @@ const Register = () => {
                     onChange={handleChange}
                     required
                     placeholder="Enter your phone number"
-                    className="w-full pl-10 pr-4 py-3 rounded-lg bg-[#1E293B] text-white placeholder-gray-400 border border-[#334155] focus:outline-none focus:ring-2 focus:ring-[#33FEBF] transition-colors"
-                    disabled={loading}
+                    className="w-full pl-10 pr-4 py-3 rounded-lg bg-[#1E293B] text-white placeholder-gray-400 border border-[#334155] focus:outline-none focus:ring-2 focus:ring-[#33FEBF]"
                   />
                 </div>
-                <p className="text-xs text-gray-400">Enter 10-digit Indian mobile number</p>
               </div>
               
               <div className="space-y-2">
@@ -245,19 +181,17 @@ const Register = () => {
                     onChange={handleChange}
                     required
                     placeholder="Create a password"
-                    className="w-full pl-10 pr-12 py-3 rounded-lg bg-[#1E293B] text-white placeholder-gray-400 border border-[#334155] focus:outline-none focus:ring-2 focus:ring-[#33FEBF] transition-colors"
-                    disabled={loading}
+                    className="w-full pl-10 pr-12 py-3 rounded-lg bg-[#1E293B] text-white placeholder-gray-400 border border-[#334155] focus:outline-none focus:ring-2 focus:ring-[#33FEBF]"
                   />
                   <button 
                     type="button" 
-                    className="absolute inset-y-0 right-0 px-3 flex items-center text-gray-400 hover:text-[#33FEBF] transition-colors"
+                    className="absolute inset-y-0 right-0 px-3 flex items-center text-gray-400 hover:text-[#33FEBF]"
                     onClick={() => setShowPassword(!showPassword)}
-                    disabled={loading}
                   >
                     {showPassword ? <FaEyeSlash className="w-4 h-4" /> : <FaEye className="w-4 h-4" />}
                   </button>
                 </div>
-                <p className="text-xs text-gray-400">Minimum 8 characters</p>
+                <p className="text-xs text-gray-400">Minimum 8 characters with at least one number</p>
               </div>
               
               <div className="space-y-2">
@@ -274,14 +208,12 @@ const Register = () => {
                     onChange={handleChange}
                     required
                     placeholder="Confirm your password"
-                    className="w-full pl-10 pr-12 py-3 rounded-lg bg-[#1E293B] text-white placeholder-gray-400 border border-[#334155] focus:outline-none focus:ring-2 focus:ring-[#33FEBF] transition-colors"
-                    disabled={loading}
+                    className="w-full pl-10 pr-12 py-3 rounded-lg bg-[#1E293B] text-white placeholder-gray-400 border border-[#334155] focus:outline-none focus:ring-2 focus:ring-[#33FEBF]"
                   />
                   <button 
                     type="button" 
-                    className="absolute inset-y-0 right-0 px-3 flex items-center text-gray-400 hover:text-[#33FEBF] transition-colors"
+                    className="absolute inset-y-0 right-0 px-3 flex items-center text-gray-400 hover:text-[#33FEBF]"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    disabled={loading}
                   >
                     {showConfirmPassword ? <FaEyeSlash className="w-4 h-4" /> : <FaEye className="w-4 h-4" />}
                   </button>
@@ -294,25 +226,22 @@ const Register = () => {
                   id="terms" 
                   required
                   className="h-4 w-4 text-[#33FEBF] focus:ring-[#33FEBF] border-gray-600 rounded bg-[#1E293B]"
-                  disabled={loading}
                 />
                 <label htmlFor="terms" className="ml-2 block text-sm text-gray-300">
-                  I agree to the <a href="/terms" className="text-[#33FEBF] hover:underline transition-colors">Terms of Service</a> and <a href="/privacy" className="text-[#33FEBF] hover:underline transition-colors">Privacy Policy</a>
+                  I agree to the <a href="/terms" className="text-[#33FEBF] hover:underline">Terms of Service</a> and <a href="/privacy" className="text-[#33FEBF] hover:underline">Privacy Policy</a>
                 </label>
               </div>
               
               <button 
                 type="submit" 
-                className={`w-full flex items-center justify-center py-3 px-4 rounded-lg font-medium transition-all duration-300 ${
-                  loading 
-                    ? 'bg-[#2a4a3e] cursor-not-allowed text-gray-300' 
-                    : 'bg-[#33FEBF] hover:bg-[#2bd4a8] text-[#141E28] hover:shadow-lg'
+                className={`w-full flex items-center justify-center py-3 px-4 rounded-lg font-medium transition-colors duration-300 ${
+                  loading ? 'bg-[#2a4a3e] cursor-not-allowed' : 'bg-[#33FEBF] hover:bg-[#2bd4a8] text-[#141E28]'
                 }`}
                 disabled={loading}
               >
                 {loading ? (
                   <>
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
@@ -321,7 +250,7 @@ const Register = () => {
                 ) : (
                   <>
                     <FaSignInAlt className="mr-2" />
-                    <span>Create Account</span>
+                    <span>Register</span>
                   </>
                 )}
               </button>
@@ -329,32 +258,10 @@ const Register = () => {
           )}
           
           <div className="mt-6 text-center text-sm text-gray-300">
-            <p>Already have an account? <Link to="/login" className="text-[#33FEBF] hover:underline transition-colors">Sign in</Link></p>
+            <p>Already have an account? <a href="/login" className="text-[#33FEBF] hover:underline">Sign in</a></p>
           </div>
         </div>
       </div>
-
-      {/* Custom CSS for animations */}
-      <style jsx>{`
-        @keyframes shake {
-          0%, 100% { transform: translateX(0); }
-          25% { transform: translateX(-5px); }
-          75% { transform: translateX(5px); }
-        }
-        
-        @keyframes fade-in {
-          from { opacity: 0; transform: translateY(-10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .animate-shake {
-          animation: shake 0.5s ease-in-out;
-        }
-        
-        .animate-fade-in {
-          animation: fade-in 0.3s ease-out;
-        }
-      `}</style>
     </div>
   );
 };
