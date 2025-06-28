@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search, FileText, Building2, Scale, Home, CreditCard, Globe } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import apiService from '../apiService';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -40,7 +41,7 @@ const Index = () => {
   ];
 
   const categories = [
-    { id: 'all', key: 'categories.all', label: 'All Forms' },
+    { id: 'all', key: 'categories.all', label: 'All Categories' },
     { id: 'banking', key: 'categories.banking', label: 'Banking & Financial' },
     { id: 'legal', key: 'categories.legal', label: 'Legal & RTI' },
     { id: 'civil', key: 'categories.civil', label: 'Civil & Property' },
@@ -65,6 +66,23 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-gray-50 to-[#33FEBF]/5">
+      <nav className="w-full bg-[#141E28] text-[#33FEBF] px-6 py-4 flex items-center justify-between shadow mb-8">
+        <div className="text-2xl font-bold">Vaani-Nyay</div>
+        <div className="flex items-center gap-2">
+          <Link
+            to="/home"
+            className="text-[#33FEBF] hover:underline font-medium px-4 py-2 rounded transition"
+          >
+            Go to Dashboard
+          </Link>
+          <Button
+            onClick={() => apiService.logout()}
+            className="bg-[#33FEBF] text-[#141E28] hover:bg-[#2ad1a3] font-semibold px-4 py-2 rounded transition"
+          >
+            Logout
+          </Button>
+        </div>
+      </nav>
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-12">
@@ -119,7 +137,7 @@ const Index = () => {
                 <SelectContent className="bg-white">
                   {categories.map((category) => (
                     <SelectItem key={category.id} value={category.id} className="hover:bg-[#33FEBF]/10">
-                      {translate(category.key) || category.label}
+                      {translate(category.key) !== category.key ? translate(category.key) : category.label}
                     </SelectItem>
                   ))}
                 </SelectContent>

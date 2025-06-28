@@ -16,6 +16,8 @@ import AadhaarESign from "./pages/Aadharesign";
 import './index.css';
 import ChatbotFAB from './components/ChatbotFAB';
 import ProtectedRoute from "./components/ProtectedRoute";
+import PublicRoute from "./components/PublicRoute";
+
 
 const queryClient = new QueryClient();
 
@@ -30,8 +32,17 @@ function AppRoutes() {
       <Routes>
         <Route path="/" element={<Navigate to="/home" replace />} />
         <Route path="/home" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+
+        <Route path="/login" element={
+          <PublicRoute>
+            <Login />
+          </PublicRoute>
+        } />
+        <Route path="/register" element={
+          <PublicRoute>
+            <Register />
+          </PublicRoute>
+        } />
         <Route
           path="/forms"
           element={
@@ -43,6 +54,8 @@ function AppRoutes() {
         <Route path="/about" element={<About />} />
         <Route path="/form/:formId" element={<FormPage />} />
         <Route path="/aadhaar-esign" element={<AadhaarESign />} />
+
+        <Route path="/ask-vaani-nyay" element={<ChatbotFAB key="chatbot-page" forceOpen />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       {!hideChatbot && <ChatbotFAB />}

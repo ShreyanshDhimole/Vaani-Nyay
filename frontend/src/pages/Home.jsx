@@ -85,7 +85,7 @@ const contactRef = useRef(null);
               >
                 Start Your Legal Application
               </button>
-              <button className="bg-transparent hover:bg-white hover:bg-opacity-10 font-bold py-3 px-8 border-2 border-white rounded-lg transition duration-300 transform hover:scale-105">
+              <button onClick={() => navigate('/ask-vaani-nyay')} className="bg-transparent hover:bg-white hover:bg-opacity-10 font-bold py-3 px-8 border-2 border-white rounded-lg transition duration-300 transform hover:scale-105">
                 Get Legal Assistance
               </button>
             </div>

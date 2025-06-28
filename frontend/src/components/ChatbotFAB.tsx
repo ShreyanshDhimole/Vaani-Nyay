@@ -42,8 +42,8 @@ const getLegalFallbackResponse = (userMessage: string): string => {
     }
 };
 
-const ChatbotFAB: React.FC = () => {
-    const [open, setOpen] = useState(false);
+const ChatbotFAB: React.FC<{ forceOpen?: boolean }> = ({ forceOpen = false }) => {
+    const [open, setOpen] = useState(forceOpen);
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
@@ -58,7 +58,7 @@ const ChatbotFAB: React.FC = () => {
         if (messages.length === 0) {
             setMessages([{
                 role: 'assistant',
-                content: 'Hello! I\'m Vaani-Nyay AI assistant powered by Google Gemini. I\'m here to help you with your legal questions and provide guidance on Indian law. How can I assist you today?',
+                content: 'Hello! I\'m Vaani-Nyay AI assistant. I\'m here to help you with your legal questions and provide guidance on Indian law. How can I assist you today?',
                 timestamp: new Date()
             }]);
         }

@@ -1,145 +1,97 @@
-// Frontend API Service Helper
+// apiService.js
+
 const API_BASE_URL = 'http://localhost:5000/api';
 
 class ApiService {
   constructor() {
-    this.baseURL = API_BASE_URL;
+    this.storage = sessionStorage;
+    this.token = this.storage.getItem('token');
+    this.user = JSON.parse(this.storage.getItem('user') || 'null');
   }
 
-  // Get auth token from localStorage
-  getAuthToken() {
-    return localStorage.getItem('token');
+  setPersistentStorage(rememberMe) {
+    this.storage = rememberMe ? localStorage : sessionStorage;
   }
 
-  // Get user from localStorage
-  getUser() {
-    const user = localStorage.getItem('user');
-    return user ? JSON.parse(user) : null;
-  }
-
-  // Check if user is authenticated
   isAuthenticated() {
-    const token = this.getAuthToken();
-    const user = this.getUser();
-    return !!(token && user);
-  }
-
-  // Logout user
-  logout() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    window.location.href = '/login';
-  }
-
-  // Generic API call method
-  async apiCall(endpoint, options = {}) {
-    const url = `${this.baseURL}${endpoint}`;
-    const token = this.getAuthToken();
-
-    const config = {
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token && { Authorization: `Bearer ${token}` }),
-        ...options.headers,
-      },
-      ...options,
-    };
-
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    const user = localStorage.getItem('user') || sessionStorage.getItem('user');
+    if (!token || !user) {
+      this.clearAuth();
+      return false;
+    }
     try {
-      const response = await fetch(url, config);
-      const data = await response.json();
-
-      if (!response.ok) {
-        // Handle authentication errors
-        if (response.status === 401 || response.status === 403) {
-          this.logout();
-          throw new Error('Session expired. Please login again.');
-        }
-        throw new Error(data.error || `HTTP error! status: ${response.status}`);
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const currentTime = Date.now() / 1000;
+      if (payload.exp && payload.exp < currentTime) {
+        this.clearAuth();
+        return false;
       }
-
-      return data;
-    } catch (error) {
-      console.error(`API call failed for ${endpoint}:`, error);
-      throw error;
+      return true;
+    } catch (err) {
+      this.clearAuth();
+      return false;
     }
   }
 
-  // Auth methods
-  async register(userData) {
-    return this.apiCall('/auth/register', {
-      method: 'POST',
-      body: JSON.stringify(userData),
-    });
+  setAuth(token, user) {
+    this.clearAuth();
+    this.storage.setItem('token', token);
+    this.storage.setItem('user', JSON.stringify(user));
+    this.token = token;
+    this.user = user;
+  }
+
+  clearAuth() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('user');
+    this.token = null;
+    this.user = null;
+  }
+
+  getToken() {
+    return localStorage.getItem('token') || sessionStorage.getItem('token');
+  }
+
+  getCurrentUser() {
+    return JSON.parse(localStorage.getItem('user') || sessionStorage.getItem('user') || 'null');
   }
 
   async login(credentials) {
-    return this.apiCall('/auth/login', {
+    const response = await fetch(`${API_BASE_URL}/auth/login`, {
       method: 'POST',
-      body: JSON.stringify(credentials),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(credentials)
     });
+
+    const data = await response.json();
+
+    if (!response.ok) throw new Error(data.error || 'Login failed');
+    this.setAuth(data.token, data.user);
+    return data;
   }
 
-  async getProfile() {
-    return this.apiCall('/auth/profile');
-  }
-
-  async logoutUser() {
-    try {
-      await this.apiCall('/auth/logout', { method: 'POST' });
-    } catch (error) {
-      console.error('Logout API call failed:', error);
-    } finally {
-      this.logout();
-    }
-  }
-
-  // Health check
-  async healthCheck() {
-    return this.apiCall('/health');
-  }
-
-  // Future methods for forms, documents, etc.
-  async getForms() {
-    return this.apiCall('/forms');
-  }
-
-  async createForm(formData) {
-    return this.apiCall('/forms', {
+  async register(formData) {
+    const response = await fetch(`${API_BASE_URL}/auth/register`, {
       method: 'POST',
-      body: JSON.stringify(formData),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData)
     });
+
+    const data = await response.json();
+
+    if (!response.ok) throw new Error(data.error || 'Registration failed');
+    this.setAuth(data.token, data.user);
+    return data;
   }
 
-  async updateForm(formId, formData) {
-    return this.apiCall(`/forms/${formId}`, {
-      method: 'PUT',
-      body: JSON.stringify(formData),
-    });
-  }
-
-  async deleteForm(formId) {
-    return this.apiCall(`/forms/${formId}`, {
-      method: 'DELETE',
-    });
+  logout() {
+    this.clearAuth();
+    window.location.href = '/home';
   }
 }
 
-// Create and export a singleton instance
 const apiService = new ApiService();
 export default apiService;
-
-// Export individual methods for convenience
-export const {
-  register,
-  login,
-  getProfile,
-  logoutUser,
-  healthCheck,
-  getForms,
-  createForm,
-  updateForm,
-  deleteForm,
-  isAuthenticated,
-  getUser,
-} = apiService;

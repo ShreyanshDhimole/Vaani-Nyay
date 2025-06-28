@@ -132,14 +132,10 @@ app.get('/api/health', (req, res) => {
 // Register
 app.post('/api/auth/register', async (req, res) => {
   try {
-    const { name, email, phone, password, confirmPassword } = req.body;
+    const { name, email, phone, password } = req.body;
 
-    if (!name || !email || !phone || !password || !confirmPassword) {
+    if (!name || !email || !phone || !password) {
       return res.status(400).json({ error: 'All fields are required' });
-    }
-
-    if (password !== confirmPassword) {
-      return res.status(400).json({ error: 'Passwords do not match' });
     }
 
     if (password.length < 8) {
@@ -164,19 +160,20 @@ app.post('/api/auth/register', async (req, res) => {
 
     await user.save();
 
-    const token = user.generateAuthToken();
+    // JWT expires in 2 hours
+    const token = jwt.sign(
+      { id: user._id },
+      process.env.JWT_SECRET || 'your_jwt_secret_key_here',
+      { expiresIn: '2h' }
+    );
 
     res.status(201).json({
-      message: 'User registered successfully',
+      token,
       user: {
-        id: user._id,
         name: user.name,
         email: user.email,
-        phone: user.phone,
-        role: user.role,
-        createdAt: user.createdAt
-      },
-      token
+        phone: user.phone
+      }
     });
 
   } catch (error) {
@@ -203,22 +200,20 @@ app.post('/api/auth/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    user.lastLogin = new Date();
-    await user.save();
-
-    const token = user.generateAuthToken();
+    // JWT expires in 2 hours
+    const token = jwt.sign(
+      { id: user._id },
+      process.env.JWT_SECRET || 'your_jwt_secret_key_here',
+      { expiresIn: '2h' }
+    );
 
     res.json({
-      message: 'Login successful',
+      token,
       user: {
-        id: user._id,
         name: user.name,
         email: user.email,
-        phone: user.phone,
-        role: user.role,
-        lastLogin: user.lastLogin
-      },
-      token
+        phone: user.phone
+      }
     });
 
   } catch (error) {
